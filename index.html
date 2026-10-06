@@ -6,7 +6,7 @@
 <title>Md. Rajibul Islam Rabbi — Portfolio</title>
 <meta name="description" content="Md. Rajibul Islam Rabbi — final-year Computer Science student and Jr. Executive at Daraz, moving into software development. Based in Dhaka, Bangladesh.">
 <meta name="author" content="Md. Rajibul Islam Rabbi">
-<meta name="theme-color" content="#050B12">
+<meta name="theme-color" content="#00DEC8">
 <meta property="og:type" content="website">
 <meta property="og:title" content="Md. Rajibul Islam Rabbi — Portfolio">
 <meta property="og:description" content="CSE student at Southeast University and Jr. Executive at Daraz. Employee of the Year 2025. Team lead of PulseHR, an HR system for Bangladeshi companies.">
@@ -16,7 +16,7 @@
 <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,650;1,9..144,500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,650;1,9..144,500&family=Nunito:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <script>
   // Apply the saved theme before first paint, so the page never flashes the wrong one.
   (function () {
@@ -28,42 +28,44 @@
   })();
 </script>
 <style>
-/* ---------- tokens: dark (the default) ---------- */
+/* ---------- tokens: the original portfolio palette (dark, the default) ---------- */
 :root {
-  --bg: #050B12;
-  --surface: rgba(14, 26, 32, .82);
-  --surface-2: rgba(30, 49, 56, .6);
-  --solid: #0D1920;
-  --ink: #E6F1EF;
-  --muted: #9AB0AD;
-  --faint: #6E8380;
-  --line: rgba(120, 190, 180, .16);
-  --accent: #2DD4BF;
-  --accent-ink: #04211D;
-  --accent-soft: rgba(45, 212, 191, .11);
+  --bg: #08111A;
+  --surface: rgba(17, 28, 40, .86);   /* #111C28 */
+  --surface-2: #162233;
+  --solid: #111C28;
+  --ink: #D6F0EC;
+  --muted: #6FA8A4;
+  --faint: #4E807B;
+  --line: #1E4540;
+  --accent: #00DEC8;
+  --accent-ink: #08111A;
+  --accent-soft: rgba(0, 222, 200, .10);
   --warm: #FF9A5C;
-  --warm-soft: rgba(255, 154, 92, .13);
+  --warm-soft: rgba(255, 154, 92, .11);
   --shadow: 0 1px 2px rgba(0, 0, 0, .35), 0 12px 34px rgba(0, 0, 0, .35);
+  --glow: 0 0 28px rgba(0, 222, 200, .14);
   --radius: 18px;
   --max: 1080px;
   color-scheme: dark;
 }
 /* light, when chosen with the toggle */
 :root[data-theme="light"] {
-  --bg: #F6F7FA;
-  --surface: rgba(255, 255, 255, .9);
-  --surface-2: #EEF2F1;
+  --bg: #F4F8F8;
+  --surface: rgba(255, 255, 255, .92);
+  --surface-2: #E8F3F1;
   --solid: #FFFFFF;
-  --ink: #102221;
-  --muted: #566866;
-  --faint: #7B8B89;
-  --line: #E1E7E4;
-  --accent: #0F8F84;
+  --ink: #0D1B27;
+  --muted: #3F6966;
+  --faint: #6A8E8A;
+  --line: #CFE4E1;
+  --accent: #00897C;
   --accent-ink: #FFFFFF;
-  --accent-soft: rgba(15, 143, 132, .09);
-  --warm: #C85A20;
-  --warm-soft: rgba(217, 105, 46, .11);
-  --shadow: 0 1px 2px rgba(16, 34, 33, .05), 0 8px 28px rgba(16, 34, 33, .07);
+  --accent-soft: rgba(0, 137, 124, .09);
+  --warm: #C8571B;
+  --warm-soft: rgba(255, 154, 92, .16);
+  --shadow: 0 1px 2px rgba(13, 27, 39, .05), 0 8px 28px rgba(13, 27, 39, .07);
+  --glow: 0 0 0 transparent;
   color-scheme: light;
 }
 
@@ -71,7 +73,7 @@
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 html { scroll-behavior: smooth; scroll-padding-top: 84px; -webkit-text-size-adjust: 100%; }
 body {
-  font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  font-family: 'Nunito', system-ui, -apple-system, 'Segoe UI', sans-serif;
   background: var(--bg);
   color: var(--ink);
   line-height: 1.65;
@@ -83,17 +85,16 @@ body {
 .nebula, #sky { position: fixed; inset: 0; pointer-events: none; z-index: 0; }
 .nebula {
   background:
-    radial-gradient(60vw 45vw at 88% 4%, rgba(45, 212, 191, .16), transparent 62%),
-    radial-gradient(48vw 40vw at 6% 38%, rgba(139, 92, 246, .14), transparent 64%),
-    radial-gradient(52vw 42vw at 72% 92%, rgba(255, 154, 92, .10), transparent 62%),
-    radial-gradient(120vw 80vw at 50% 50%, #08131C 0%, #050B12 70%);
+    radial-gradient(55vw 50vw at 18% 88%, rgba(0, 222, 200, .10), transparent 60%),
+    radial-gradient(45vw 50vw at 82% 8%, rgba(0, 168, 150, .09), transparent 60%),
+    radial-gradient(40vw 35vw at 95% 70%, rgba(255, 154, 92, .05), transparent 60%),
+    #08111A;
 }
 :root[data-theme="light"] .nebula {
   background:
-    radial-gradient(60vw 45vw at 88% 4%, rgba(15, 143, 132, .10), transparent 62%),
-    radial-gradient(48vw 40vw at 6% 38%, rgba(124, 92, 246, .07), transparent 64%),
-    radial-gradient(52vw 42vw at 72% 92%, rgba(217, 105, 46, .07), transparent 62%),
-    #F6F7FA;
+    radial-gradient(55vw 50vw at 18% 88%, rgba(0, 137, 124, .08), transparent 60%),
+    radial-gradient(45vw 50vw at 82% 8%, rgba(0, 137, 124, .07), transparent 60%),
+    #F4F8F8;
 }
 header.nav, main, footer { position: relative; z-index: 1; }
 img { max-width: 100%; display: block; }
@@ -162,92 +163,69 @@ header.nav {
 .hero h1 em { font-style: italic; color: var(--accent); font-weight: 500; }
 .lead { font-size: 1.15rem; color: var(--muted); max-width: 34em; }
 .hero-ctas { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 32px; }
-/* 3D portrait: a nebula disc behind, the cut-out photo in front breaking out of the
-   top of the disc, and the award badge nearest. Each layer sits at its own depth, so
-   tilting the stage (mouse on desktop, a slow float on touch) shows real parallax. */
-.portrait { position: relative; justify-self: center; width: min(100%, 360px); perspective: 1100px; }
+/* 3D portrait: the cut-out photo in front of an arch-topped card with a fine grid and
+   a thin cyan edge. The head rises just above the card's top edge; the card, the photo
+   and the award badge sit at different depths, so tilting the stage shows parallax. */
+.portrait { position: relative; justify-self: center; width: min(100%, 360px); perspective: 1200px; }
 .p3d {
   --rx: 0deg; --ry: 0deg;
-  position: relative; aspect-ratio: 1 / 1.33;
+  position: relative; aspect-ratio: 1 / 1.2;
   transform-style: preserve-3d;
   transform: rotateX(var(--rx)) rotateY(var(--ry));
-  transition: transform .35s cubic-bezier(.2, .7, .2, 1);
+  transition: transform .4s cubic-bezier(.2, .7, .2, 1);
 }
-.p3d.tilting { transition: transform .08s linear; }
-.p3d-disc {
-  position: absolute; left: 0; right: 0; bottom: 0; aspect-ratio: 1; border-radius: 50%;
-  transform: translateZ(-50px);
+.p3d.tilting { transition: transform .1s linear; }
+.p3d-card {
+  position: absolute; left: 0; right: 0; top: 16%; bottom: 0;
+  border-radius: 180px 180px 26px 26px;
+  transform: translateZ(-30px);
   background:
-    radial-gradient(1px 1px at 22% 30%, #fff, transparent), radial-gradient(1px 1px at 70% 22%, #fff, transparent),
-    radial-gradient(1.5px 1.5px at 82% 58%, #CFFBF3, transparent), radial-gradient(1px 1px at 35% 72%, #fff, transparent),
-    radial-gradient(1px 1px at 58% 44%, #FFD9BD, transparent), radial-gradient(1px 1px at 14% 55%, #D9CCFF, transparent),
-    radial-gradient(circle at 30% 28%, rgba(45, 212, 191, .45), transparent 55%),
-    radial-gradient(circle at 75% 78%, rgba(139, 92, 246, .45), transparent 58%),
-    radial-gradient(circle at 80% 20%, rgba(255, 154, 92, .22), transparent 45%),
-    radial-gradient(circle, #0F2A33 0%, #08151C 70%);
-  border: 1px solid rgba(127, 239, 226, .28);
-  box-shadow: 0 0 70px rgba(45, 212, 191, .22), 0 0 140px rgba(139, 92, 246, .14), inset 0 0 60px rgba(0, 0, 0, .55);
+    radial-gradient(ellipse 70% 55% at 50% 100%, rgba(0, 222, 200, .20), transparent 70%),
+    linear-gradient(180deg, #0D1B27 0%, #08111A 100%);
+  border: 1px solid rgba(0, 222, 200, .35);
+  box-shadow: 0 0 0 1px rgba(0, 222, 200, .06), 0 0 40px rgba(0, 222, 200, .16), 0 30px 60px rgba(0, 0, 0, .45);
+  overflow: hidden;
 }
-.p3d-orbit {
-  position: absolute; left: -10%; right: -10%; bottom: -8%; aspect-ratio: 1;
-  border-radius: 50%; border: 1px solid rgba(127, 239, 226, .30);
-  transform: translateZ(-20px) rotateX(74deg) rotateZ(-18deg);
-  transform-style: preserve-3d;
+.p3d-card::before { /* the hero's fine grid, fading out towards the edges */
+  content: ''; position: absolute; inset: 0;
+  background-image: linear-gradient(#163530 1px, transparent 1px), linear-gradient(90deg, #163530 1px, transparent 1px);
+  background-size: 26px 26px; opacity: .55;
+  -webkit-mask-image: radial-gradient(ellipse 70% 70% at 50% 40%, #000 20%, transparent 75%);
+  mask-image: radial-gradient(ellipse 70% 70% at 50% 40%, #000 20%, transparent 75%);
 }
-.p3d-orbit::after {
-  content: ''; position: absolute; top: 50%; left: 50%; width: 10px; height: 10px; margin: -5px;
-  border-radius: 50%; background: var(--warm); box-shadow: 0 0 14px 3px rgba(255, 154, 92, .7);
-  offset-path: circle(50%); offset-distance: 0%;
-  animation: orbit 14s linear infinite;
-}
-@keyframes orbit { to { offset-distance: 100%; } }
 .p3d-person {
   position: absolute; inset: 0;
-  transform: translateZ(40px);
-  /* Visible = the disc circle OR everything above the disc's middle. The head breaks
-     out of the top; below the middle the body is cut to the circle. */
-  -webkit-mask-image: radial-gradient(circle closest-side, #000 99%, transparent 100%), linear-gradient(#000, #000);
-  mask-image: radial-gradient(circle closest-side, #000 99%, transparent 100%), linear-gradient(#000, #000);
-  -webkit-mask-size: 100% 75.19%, 100% 62.4%;
-  mask-size: 100% 75.19%, 100% 62.4%;
-  -webkit-mask-position: bottom center, top center;
-  mask-position: bottom center, top center;
-  -webkit-mask-repeat: no-repeat;
-  mask-repeat: no-repeat;
-  -webkit-mask-composite: source-over;
-  mask-composite: add;
+  transform: translateZ(30px);
+  /* the body fades into the card at the bottom */
+  -webkit-mask-image: linear-gradient(to bottom, #000 78%, transparent 98%);
+  mask-image: linear-gradient(to bottom, #000 78%, transparent 98%);
 }
 .p3d-person img {
-  position: absolute; top: 4%; left: 7%; width: 86%; height: auto; max-width: none;
-  filter: drop-shadow(0 0 1px rgba(127, 239, 226, .55)) drop-shadow(0 0 18px rgba(45, 212, 191, .28));
-  /* fade the photo's cut-off shoulder edges into the disc */
-  -webkit-mask-image: linear-gradient(to right, transparent 0, #000 13%, #000 87%, transparent 100%);
-  mask-image: linear-gradient(to right, transparent 0, #000 13%, #000 87%, transparent 100%);
+  position: absolute; top: 2%; left: 0; width: 100%; height: auto; max-width: none;
+  filter: drop-shadow(0 0 1px rgba(0, 222, 200, .35)) drop-shadow(0 14px 24px rgba(0, 0, 0, .45));
 }
-:root[data-theme="light"] .p3d-disc {
+:root[data-theme="light"] .p3d-card {
   background:
-    radial-gradient(circle at 30% 28%, rgba(15, 143, 132, .28), transparent 55%),
-    radial-gradient(circle at 75% 78%, rgba(124, 92, 246, .22), transparent 58%),
-    radial-gradient(circle at 80% 20%, rgba(217, 105, 46, .16), transparent 45%),
-    radial-gradient(circle, #FFFFFF 0%, #E9F3F1 75%);
-  border-color: rgba(15, 143, 132, .25);
-  box-shadow: 0 0 60px rgba(15, 143, 132, .16), inset 0 0 40px rgba(15, 143, 132, .08);
+    radial-gradient(ellipse 70% 55% at 50% 100%, rgba(0, 137, 124, .16), transparent 70%),
+    linear-gradient(180deg, #FFFFFF 0%, #EAF4F2 100%);
+  border-color: rgba(0, 137, 124, .3);
+  box-shadow: 0 20px 50px rgba(13, 27, 39, .12);
 }
-:root[data-theme="light"] .p3d-orbit { border-color: rgba(15, 143, 132, .3); }
-:root[data-theme="light"] .p3d-person img { filter: drop-shadow(0 10px 18px rgba(16, 34, 33, .18)); }
+:root[data-theme="light"] .p3d-card::before { background-image: linear-gradient(#D6E9E6 1px, transparent 1px), linear-gradient(90deg, #D6E9E6 1px, transparent 1px); }
+:root[data-theme="light"] .p3d-person img { filter: drop-shadow(0 12px 22px rgba(13, 27, 39, .18)); }
 @media (hover: none), (pointer: coarse) {
-  .p3d { animation: float 7s ease-in-out infinite; }
+  .p3d { animation: float 8s ease-in-out infinite; }
 }
 @keyframes float {
-  0%, 100% { transform: rotateX(4deg) rotateY(-6deg) translateY(0); }
-  50% { transform: rotateX(-3deg) rotateY(6deg) translateY(-6px); }
+  0%, 100% { transform: rotateX(2deg) rotateY(-4deg) translateY(0); }
+  50% { transform: rotateX(-2deg) rotateY(4deg) translateY(-5px); }
 }
 @media (prefers-reduced-motion: reduce) {
-  .p3d, .p3d-orbit::after { animation: none; }
+  .p3d { animation: none; }
 }
 .award {
-  position: absolute; left: -34px; bottom: 2%;
-  transform: translateZ(80px);
+  position: absolute; left: -30px; bottom: 7%;
+  transform: translateZ(60px);
   display: flex; align-items: center; gap: 12px;
   background: var(--solid); border: 1px solid var(--line); border-radius: 16px;
   padding: 12px 16px; box-shadow: var(--shadow);
@@ -404,8 +382,7 @@ footer { padding: 40px 0 56px; color: var(--faint); font-size: .9rem; }
   .project-media { position: static; }
   .hero-grid { gap: 48px; }
   .portrait { order: -1; width: min(100%, 270px); }
-  .p3d-orbit { left: -5%; right: -5%; }
-  .award { left: 50%; transform: translateX(-50%) translateZ(80px); bottom: -22px; white-space: nowrap; }
+  .award { left: 50%; transform: translateX(-50%) translateZ(60px); bottom: -22px; white-space: nowrap; }
   .stats { grid-template-columns: repeat(2, 1fr); margin-top: 56px; }
   .stat:nth-child(3) { border-left: 0; }
   .stat:nth-child(n+3) { border-top: 1px solid var(--line); }
@@ -491,12 +468,11 @@ footer { padding: 40px 0 56px; color: var(--faint); font-size: .9rem; }
         </div>
         <div class="portrait reveal" id="portrait">
           <div class="p3d" id="p3d">
-            <div class="p3d-disc" aria-hidden="true"></div>
-            <div class="p3d-orbit" aria-hidden="true"></div>
+            <div class="p3d-card" aria-hidden="true"></div>
             <div class="p3d-person">
               <picture>
                 <source srcset="assets/rabbi-cutout.webp" type="image/webp">
-                <img src="assets/rabbi-cutout.png" width="600" height="894" alt="Portrait of Md. Rajibul Islam Rabbi">
+                <img src="assets/rabbi-cutout.png" width="646" height="746" alt="Portrait of Md. Rajibul Islam Rabbi">
               </picture>
             </div>
             <div class="award">
@@ -777,8 +753,8 @@ footer { padding: 40px 0 56px; color: var(--faint); font-size: .9rem; }
     var still = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     var DPR = Math.min(window.devicePixelRatio || 1, 2);
     var W, H, stars = [], shots = [], raf = null, last = 0, nextShot = 0, mobile;
-    var DARK = ['#FFFFFF', '#FFFFFF', '#FFFFFF', '#CFFBF3', '#BFEFFF', '#FFD9BD', '#D9CCFF'];
-    var LIGHT = ['#0F8F84', '#3B5B66', '#7C5CF6', '#C85A20'];
+    var DARK = ['#FFFFFF', '#FFFFFF', '#D6F0EC', '#D6F0EC', '#00DEC8', '#00DEC8', '#FF9A5C'];
+    var LIGHT = ['#00897C', '#3F6966', '#C8571B'];
     function isLight() { return document.documentElement.dataset.theme === 'light'; }
 
     function build() {
@@ -792,7 +768,7 @@ footer { padding: 40px 0 56px; color: var(--faint); font-size: .9rem; }
         var z = Math.pow(Math.random(), 1.6); // most stars far away, a few close
         stars.push({
           x: Math.random() * W, y: Math.random() * H, z: z,
-          r: 0.3 + z * 1.5,
+          r: 0.25 + z * 1.15,
           tw: Math.random() * 6.283, sp: 0.4 + Math.random() * 1.4,
           vx: (Math.random() - 0.5) * 0.006 * (0.4 + z),
           c: Math.floor(Math.random() * 1000)
@@ -814,19 +790,15 @@ footer { padding: 40px 0 56px; color: var(--faint); font-size: .9rem; }
         ctx.globalAlpha = light ? a * 0.4 : a;
         ctx.fillStyle = pal[s.c % pal.length];
         ctx.beginPath(); ctx.arc(s.x, y, s.r, 0, 6.283); ctx.fill();
-        if (!light && s.z > 0.75) { // soft glow on the closest stars
-          ctx.globalAlpha = a * 0.06;
-          ctx.beginPath(); ctx.arc(s.x, y, s.r * 2.6, 0, 6.283); ctx.fill();
-        }
         if (s.z > 0.45) near.push(s.x, y);
       }
       if (!mobile) { // faint constellation lines between nearby close stars
-        ctx.strokeStyle = light ? '#0F8F84' : '#7FEFE2'; ctx.lineWidth = 0.6;
+        ctx.strokeStyle = light ? '#00897C' : '#00DEC8'; ctx.lineWidth = 0.6;
         for (var p = 0; p < near.length; p += 2) {
           for (var q = p + 2; q < near.length; q += 2) {
             var dx = near[p] - near[q], dy = near[p + 1] - near[q + 1], d2 = dx * dx + dy * dy;
             if (d2 < 11000) {
-              ctx.globalAlpha = (light ? 0.05 : 0.09) * (1 - d2 / 11000);
+              ctx.globalAlpha = (light ? 0.05 : 0.07) * (1 - d2 / 11000);
               ctx.beginPath(); ctx.moveTo(near[p], near[p + 1]); ctx.lineTo(near[q], near[q + 1]); ctx.stroke();
             }
           }
@@ -837,16 +809,16 @@ footer { padding: 40px 0 56px; color: var(--faint); font-size: .9rem; }
         if (t > nextShot) {
           var ang = 0.35 + Math.random() * 0.35, spd = 0.9 + Math.random() * 0.6;
           shots.push({ x: Math.random() * W * 0.8 + W * 0.1, y: Math.random() * H * 0.4, vx: Math.cos(ang) * spd, vy: Math.sin(ang) * spd, life: 0, max: 700 + Math.random() * 500 });
-          nextShot = t + 4500 + Math.random() * 7000;
+          nextShot = t + 9000 + Math.random() * 9000;
         }
         for (var k = shots.length - 1; k >= 0; k--) {
           var sh = shots[k]; sh.life += dt; sh.x += sh.vx * dt; sh.y += sh.vy * dt;
           var f = sh.life / sh.max; if (f >= 1) { shots.splice(k, 1); continue; }
-          var tail = 90 * (1 - f * 0.5), tx = sh.x - sh.vx * tail / 1.2, ty = sh.y - sh.vy * tail / 1.2;
+          var tail = 70 * (1 - f * 0.5), tx = sh.x - sh.vx * tail / 1.2, ty = sh.y - sh.vy * tail / 1.2;
           var g = ctx.createLinearGradient(sh.x, sh.y, tx, ty);
-          g.addColorStop(0, 'rgba(255,255,255,' + (0.9 * (1 - f)) + ')');
-          g.addColorStop(1, 'rgba(127,239,226,0)');
-          ctx.globalAlpha = 1; ctx.strokeStyle = g; ctx.lineWidth = 1.4;
+          g.addColorStop(0, 'rgba(214,240,236,' + (0.7 * (1 - f)) + ')');
+          g.addColorStop(1, 'rgba(0,222,200,0)');
+          ctx.globalAlpha = 1; ctx.strokeStyle = g; ctx.lineWidth = 1;
           ctx.beginPath(); ctx.moveTo(sh.x, sh.y); ctx.lineTo(tx, ty); ctx.stroke();
         }
       }
