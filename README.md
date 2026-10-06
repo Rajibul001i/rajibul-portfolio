@@ -6,16 +6,26 @@ Personal portfolio: about, work experience at Daraz, projects (PulseHR), skills,
 
 ## Structure
 
+Each language does one job:
+
+| File | Language | Job |
+|---|---|---|
+| `index.html` | HTML | Structure and content only. No inline styles or scripts |
+| `css/style.css` | CSS | All styling: colour palette, layout, the 3D portrait card, light theme, phone layouts |
+| `js/theme-init.js` | JavaScript | Applies the saved light/dark choice before the page paints (loaded in `<head>`) |
+| `js/main.js` | JavaScript | Theme toggle, phone menu, reveal on scroll, highlighting the section in view |
+| `js/starfield.js` | JavaScript | The animated star background (canvas) |
+| `js/portrait-tilt.js` | JavaScript | 3D tilt of the portrait with the mouse |
+
 ```
-index.html            The whole site: markup, styles and a small script
-assets/rabbi-cutout.webp  Portrait with the background removed (PNG fallback alongside)
-assets/favicon.svg    Browser tab icon
-assets/social-card.jpg  Preview image shown when the link is shared
-assets/pulsehr-*.jpg  PulseHR screenshots
-assets/pulsehr-demo.mp4  PulseHR walkthrough video (loads only when played)
+assets/rabbi-cutout.webp   Portrait with the background removed (PNG fallback alongside)
+assets/favicon.svg         Browser tab icon
+assets/social-card.jpg     Preview image shown when the link is shared
+assets/pulsehr-*.jpg       PulseHR screenshots
+assets/pulsehr-demo.mp4    PulseHR walkthrough video (loads only when played)
 ```
 
-No build step. Edit `index.html` and push to `main`; GitHub Pages publishes it.
+No build step. Edit the files and push to `main`; GitHub Pages publishes them.
 
 ## Features
 
