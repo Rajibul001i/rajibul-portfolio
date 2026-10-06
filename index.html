@@ -6,10 +6,10 @@
 <title>Md. Rajibul Islam Rabbi — Portfolio</title>
 <meta name="description" content="Md. Rajibul Islam Rabbi — final-year Computer Science student and Jr. Executive at Daraz, moving into software development. Based in Dhaka, Bangladesh.">
 <meta name="author" content="Md. Rajibul Islam Rabbi">
-<meta name="theme-color" content="#0F8F84">
+<meta name="theme-color" content="#050B12">
 <meta property="og:type" content="website">
 <meta property="og:title" content="Md. Rajibul Islam Rabbi — Portfolio">
-<meta property="og:description" content="CSE student at Southeast University and Jr. Executive at Daraz. Employee of the Year 2025. Moving into software development.">
+<meta property="og:description" content="CSE student at Southeast University and Jr. Executive at Daraz. Employee of the Year 2025. Team lead of PulseHR, an HR system for Bangladeshi companies.">
 <meta property="og:image" content="https://rajibul001i.github.io/rajibul-portfolio/assets/social-card.jpg">
 <meta property="og:url" content="https://rajibul001i.github.io/rajibul-portfolio/">
 <meta name="twitter:card" content="summary_large_image">
@@ -22,17 +22,38 @@
   (function () {
     try {
       var t = localStorage.getItem('theme');
-      if (t === 'light' || t === 'dark') document.documentElement.dataset.theme = t;
+      if (t === 'light') document.documentElement.dataset.theme = 'light';
     } catch (e) {}
     document.documentElement.classList.add('js');
   })();
 </script>
 <style>
-/* ---------- tokens ---------- */
+/* ---------- tokens: dark (the default) ---------- */
 :root {
-  --bg: #F7F8F6;
-  --surface: #FFFFFF;
-  --surface-2: #F0F3F1;
+  --bg: #050B12;
+  --surface: rgba(14, 26, 32, .82);
+  --surface-2: rgba(30, 49, 56, .6);
+  --solid: #0D1920;
+  --ink: #E6F1EF;
+  --muted: #9AB0AD;
+  --faint: #6E8380;
+  --line: rgba(120, 190, 180, .16);
+  --accent: #2DD4BF;
+  --accent-ink: #04211D;
+  --accent-soft: rgba(45, 212, 191, .11);
+  --warm: #FF9A5C;
+  --warm-soft: rgba(255, 154, 92, .13);
+  --shadow: 0 1px 2px rgba(0, 0, 0, .35), 0 12px 34px rgba(0, 0, 0, .35);
+  --radius: 18px;
+  --max: 1080px;
+  color-scheme: dark;
+}
+/* light, when chosen with the toggle */
+:root[data-theme="light"] {
+  --bg: #F6F7FA;
+  --surface: rgba(255, 255, 255, .9);
+  --surface-2: #EEF2F1;
+  --solid: #FFFFFF;
   --ink: #102221;
   --muted: #566866;
   --faint: #7B8B89;
@@ -42,41 +63,8 @@
   --accent-soft: rgba(15, 143, 132, .09);
   --warm: #C85A20;
   --warm-soft: rgba(217, 105, 46, .11);
-  --shadow: 0 1px 2px rgba(16, 34, 33, .05), 0 8px 28px rgba(16, 34, 33, .06);
-  --radius: 18px;
-  --max: 1080px;
-}
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) {
-    --bg: #0A1416;
-    --surface: #101D20;
-    --surface-2: #15252A;
-    --ink: #E3EEEC;
-    --muted: #93A8A5;
-    --faint: #6E8380;
-    --line: #1E3134;
-    --accent: #2DD4BF;
-    --accent-ink: #062320;
-    --accent-soft: rgba(45, 212, 191, .10);
-    --warm: #FF9A5C;
-    --warm-soft: rgba(255, 154, 92, .12);
-    --shadow: 0 1px 2px rgba(0, 0, 0, .3), 0 10px 30px rgba(0, 0, 0, .25);
-  }
-}
-:root[data-theme="dark"] {
-  --bg: #0A1416;
-  --surface: #101D20;
-  --surface-2: #15252A;
-  --ink: #E3EEEC;
-  --muted: #93A8A5;
-  --faint: #6E8380;
-  --line: #1E3134;
-  --accent: #2DD4BF;
-  --accent-ink: #062320;
-  --accent-soft: rgba(45, 212, 191, .10);
-  --warm: #FF9A5C;
-  --warm-soft: rgba(255, 154, 92, .12);
-  --shadow: 0 1px 2px rgba(0, 0, 0, .3), 0 10px 30px rgba(0, 0, 0, .25);
+  --shadow: 0 1px 2px rgba(16, 34, 33, .05), 0 8px 28px rgba(16, 34, 33, .07);
+  color-scheme: light;
 }
 
 /* ---------- base ---------- */
@@ -89,11 +77,25 @@ body {
   line-height: 1.65;
   font-size: 16px;
   overflow-x: hidden;
-  background-image:
-    radial-gradient(900px 500px at 85% -10%, var(--accent-soft), transparent 70%),
-    radial-gradient(700px 420px at -10% 20%, var(--warm-soft), transparent 70%);
-  background-repeat: no-repeat;
 }
+
+/* ---------- space background ---------- */
+.nebula, #sky { position: fixed; inset: 0; pointer-events: none; z-index: 0; }
+.nebula {
+  background:
+    radial-gradient(60vw 45vw at 88% 4%, rgba(45, 212, 191, .16), transparent 62%),
+    radial-gradient(48vw 40vw at 6% 38%, rgba(139, 92, 246, .14), transparent 64%),
+    radial-gradient(52vw 42vw at 72% 92%, rgba(255, 154, 92, .10), transparent 62%),
+    radial-gradient(120vw 80vw at 50% 50%, #08131C 0%, #050B12 70%);
+}
+:root[data-theme="light"] .nebula {
+  background:
+    radial-gradient(60vw 45vw at 88% 4%, rgba(15, 143, 132, .10), transparent 62%),
+    radial-gradient(48vw 40vw at 6% 38%, rgba(124, 92, 246, .07), transparent 64%),
+    radial-gradient(52vw 42vw at 72% 92%, rgba(217, 105, 46, .07), transparent 62%),
+    #F6F7FA;
+}
+header.nav, main, footer { position: relative; z-index: 1; }
 img { max-width: 100%; display: block; }
 a { color: inherit; }
 h1, h2, h3 { font-family: 'Fraunces', Georgia, serif; font-weight: 650; letter-spacing: -.01em; line-height: 1.15; }
@@ -105,7 +107,7 @@ section { padding: 88px 0; }
 
 /* ---------- nav ---------- */
 header.nav {
-  position: sticky; top: 0; z-index: 100;
+  position: sticky; top: 0; z-index: 100 !important;
   background: color-mix(in srgb, var(--bg) 84%, transparent);
   backdrop-filter: saturate(1.4) blur(14px);
   -webkit-backdrop-filter: saturate(1.4) blur(14px);
@@ -128,13 +130,9 @@ header.nav {
 }
 .icon-btn:hover { border-color: var(--accent); }
 .icon-btn svg { width: 18px; height: 18px; }
-.theme-btn .moon { display: none; }
-:root[data-theme="dark"] .theme-btn .sun { display: none; }
-:root[data-theme="dark"] .theme-btn .moon { display: block; }
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) .theme-btn .sun { display: none; }
-  :root:not([data-theme="light"]) .theme-btn .moon { display: block; }
-}
+.theme-btn .sun { display: none; }
+:root[data-theme="light"] .theme-btn .sun { display: block; }
+:root[data-theme="light"] .theme-btn .moon { display: none; }
 .menu-btn { display: none; }
 
 /* ---------- buttons ---------- */
@@ -172,7 +170,7 @@ header.nav {
 .award {
   position: absolute; left: -26px; bottom: 26px;
   display: flex; align-items: center; gap: 12px;
-  background: var(--surface); border: 1px solid var(--line); border-radius: 16px;
+  background: var(--solid); border: 1px solid var(--line); border-radius: 16px;
   padding: 12px 16px; box-shadow: var(--shadow);
 }
 .award .ico { width: 40px; height: 40px; border-radius: 12px; background: var(--warm-soft); display: grid; place-items: center; font-size: 1.25rem; }
@@ -224,6 +222,34 @@ header.nav {
 .job li { position: relative; padding-left: 20px; color: var(--muted); }
 .job li::before { content: ''; position: absolute; left: 2px; top: .7em; width: 7px; height: 7px; border-radius: 2px; background: var(--accent); opacity: .7; }
 .badge-award { display: inline-flex; align-items: center; gap: 8px; margin-top: 18px; padding: 7px 13px; border-radius: 999px; background: var(--warm-soft); font-size: .88rem; font-weight: 600; }
+
+/* ---------- projects ---------- */
+.project {
+  display: grid; grid-template-columns: 1.1fr .9fr; gap: 36px; align-items: start;
+  background: var(--surface); border: 1px solid var(--line); border-radius: 24px;
+  padding: 28px; box-shadow: var(--shadow);
+}
+.project-media { position: sticky; top: 92px; }
+.project-media video {
+  width: 100%; aspect-ratio: 16 / 9; border-radius: 14px; border: 1px solid var(--line);
+  background: #000; display: block;
+}
+.thumbs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 10px; }
+.thumbs a { display: block; border-radius: 10px; overflow: hidden; border: 1px solid var(--line); transition: border-color .2s, transform .2s; }
+.thumbs a:hover { border-color: var(--accent); transform: translateY(-2px); }
+.thumbs img { width: 100%; height: auto; aspect-ratio: 16 / 10; object-fit: cover; object-position: top center; }
+.media-note { font-size: .82rem; color: var(--faint); margin-top: 8px; }
+.project-top { display: flex; flex-wrap: wrap; gap: 8px; }
+.project h3 { font-size: 1.9rem; margin: 14px 0 6px; }
+.project-lead { color: var(--muted); font-size: 1.02rem; }
+.project ul { list-style: none; display: grid; gap: 8px; margin-top: 16px; }
+.project li { position: relative; padding-left: 20px; color: var(--muted); font-size: .95rem; }
+.project li::before { content: ''; position: absolute; left: 2px; top: .65em; width: 7px; height: 7px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 10px var(--accent); }
+.project li strong { color: var(--ink); font-weight: 600; }
+.role { margin-top: 16px; font-size: .95rem; color: var(--muted); }
+.role strong { color: var(--ink); }
+.project .tags { margin-top: 16px; }
+.project-links { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 22px; }
 
 /* ---------- cards / skills ---------- */
 .skills-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; }
@@ -295,7 +321,8 @@ footer { padding: 40px 0 56px; color: var(--faint); font-size: .9rem; }
 
 /* ---------- responsive ---------- */
 @media (max-width: 900px) {
-  .hero-grid, .about-grid, .contact-box, .edu-grid { grid-template-columns: 1fr; }
+  .hero-grid, .about-grid, .contact-box, .edu-grid, .project { grid-template-columns: 1fr; }
+  .project-media { position: static; }
   .hero-grid { gap: 48px; }
   .portrait { order: -1; width: min(100%, 260px); }
   .award { left: 50%; transform: translateX(-50%); bottom: -22px; white-space: nowrap; }
@@ -310,7 +337,7 @@ footer { padding: 40px 0 56px; color: var(--faint); font-size: .9rem; }
   .nav-links {
     display: none; position: absolute; top: 68px; left: 0; right: 0;
     flex-direction: column; gap: 2px; padding: 12px 16px 18px;
-    background: var(--surface); border-bottom: 1px solid var(--line); box-shadow: var(--shadow);
+    background: var(--solid); border-bottom: 1px solid var(--line); box-shadow: var(--shadow);
   }
   .nav-links.open { display: flex; }
   .nav-links a { display: block; padding: 12px 14px; font-size: 1rem; }
@@ -318,6 +345,8 @@ footer { padding: 40px 0 56px; color: var(--faint); font-size: .9rem; }
   .nav-actions .btn { display: none; }
   .skills-grid { grid-template-columns: 1fr; }
   .job { grid-template-columns: 1fr; gap: 12px; padding: 22px; }
+  .project { padding: 18px; gap: 22px; }
+  .project h3 { font-size: 1.6rem; }
   .next { grid-template-columns: 1fr; }
   .hero { padding-top: 40px; }
 }
@@ -332,6 +361,8 @@ footer { padding: 40px 0 56px; color: var(--faint); font-size: .9rem; }
 </head>
 <body>
 <a class="skip" href="#main">Skip to content</a>
+<div class="nebula" aria-hidden="true"></div>
+<canvas id="sky" aria-hidden="true"></canvas>
 
 <header class="nav">
   <div class="wrap nav-inner">
@@ -340,13 +371,14 @@ footer { padding: 40px 0 56px; color: var(--faint); font-size: .9rem; }
       <ul class="nav-links" id="nav-links">
         <li><a href="#about">About</a></li>
         <li><a href="#experience">Experience</a></li>
+        <li><a href="#projects">Projects</a></li>
         <li><a href="#skills">Skills</a></li>
         <li><a href="#education">Education</a></li>
         <li><a href="#contact">Contact</a></li>
       </ul>
     </nav>
     <div class="nav-actions">
-      <button class="icon-btn theme-btn" type="button" id="theme-btn" aria-label="Switch between light and dark theme">
+      <button class="icon-btn theme-btn" type="button" id="theme-btn" aria-label="Switch between dark and light theme">
         <svg class="sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
         <svg class="moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
       </button>
@@ -458,6 +490,52 @@ footer { padding: 40px 0 56px; color: var(--faint); font-size: .9rem; }
     </div>
   </section>
 
+  <!-- PROJECTS -->
+  <section id="projects">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <p class="eyebrow">Projects</p>
+        <h2>Things I've built</h2>
+        <p>Software I've designed and built, from the first requirement to a live demo.</p>
+      </div>
+      <article class="project reveal">
+        <div class="project-media">
+          <video controls preload="none" playsinline poster="assets/pulsehr-dashboard.jpg" aria-label="PulseHR demo video, with narration">
+            <source src="assets/pulsehr-demo.mp4" type="video/mp4">
+          </video>
+          <div class="thumbs">
+            <a href="assets/pulsehr-dashboard.jpg" target="_blank" rel="noopener"><img src="assets/pulsehr-dashboard.jpg" loading="lazy" width="1280" height="800" alt="PulseHR HR dashboard listing employees at risk of leaving"></a>
+            <a href="assets/pulsehr-roster.jpg" target="_blank" rel="noopener"><img src="assets/pulsehr-roster.jpg" loading="lazy" width="1280" height="800" alt="PulseHR employee view with today's duty time and a 14-day roster"></a>
+            <a href="assets/pulsehr-recovery.jpg" target="_blank" rel="noopener"><img src="assets/pulsehr-recovery.jpg" loading="lazy" width="1280" height="800" alt="PulseHR password recovery, step three: SMS code"></a>
+          </div>
+          <p class="media-note">4-minute walkthrough as HR, a manager and an employee. Click a screenshot to enlarge.</p>
+        </div>
+        <div class="project-body">
+          <div class="project-top"><span class="pill accent">University project · Team lead</span><span class="pill">2026</span></div>
+          <h3>PulseHR</h3>
+          <p class="project-lead">An HR system for companies in Bangladesh that runs everyday HR work and warns HR early when an employee may be about to leave.</p>
+          <ul>
+            <li><strong>Everyday HR:</strong> attendance with shifts (night shifts too), leave, payroll under the Bangladesh Labour Act with PDF payslips, OKRs, recruitment and a noticeboard</li>
+            <li><strong>Three roles:</strong> HR runs the company; a manager approves leave and attendance fixes only for their own department; an employee checks in, applies for leave and downloads payslips</li>
+            <li><strong>Early warning:</strong> an attrition-risk score only HR can see, with the factors behind it, and never used to fire someone or set their pay</li>
+            <li><strong>No email needed:</strong> password recovery by employee ID, the last 4 digits of the National ID, then an SMS code</li>
+            <li><strong>Tested:</strong> 130 unit tests and 165 regression checks run on every change, on SQLite and PostgreSQL</li>
+          </ul>
+          <p class="role"><strong>My role:</strong> team lead and backend architect in a team of five at Southeast University.</p>
+          <div class="tags"><span class="tag">TypeScript</span><span class="tag">React</span><span class="tag">Node.js</span><span class="tag">Express</span><span class="tag">PostgreSQL</span><span class="tag">SQLite</span></div>
+          <div class="project-links">
+            <a class="btn btn-primary btn-sm" href="https://rajibul001i.github.io/PulseHR/app/" target="_blank" rel="noopener">Live demo ↗</a>
+            <a class="btn btn-ghost btn-sm" href="https://github.com/Rajibul001i/PulseHR" target="_blank" rel="noopener">
+              <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 .5a11.5 11.5 0 0 0-3.64 22.41c.58.1.79-.25.79-.56v-2c-3.2.7-3.88-1.37-3.88-1.37-.52-1.33-1.28-1.69-1.28-1.69-1.05-.71.08-.7.08-.7 1.16.08 1.77 1.19 1.77 1.19 1.03 1.77 2.7 1.26 3.36.96.1-.75.4-1.26.73-1.55-2.55-.29-5.24-1.28-5.24-5.69 0-1.26.45-2.29 1.19-3.1-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.18 1.18a11 11 0 0 1 5.78 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.59.23 2.76.11 3.05.74.81 1.19 1.84 1.19 3.1 0 4.42-2.7 5.4-5.26 5.68.41.36.78 1.06.78 2.14v3.17c0 .31.21.67.8.56A11.5 11.5 0 0 0 12 .5z"/></svg>
+              Source code
+            </a>
+            <a class="btn btn-ghost btn-sm" href="https://www.linkedin.com/feed/update/urn:li:ugcPost:7510592954307383297" target="_blank" rel="noopener">LinkedIn post ↗</a>
+          </div>
+        </div>
+      </article>
+    </div>
+  </section>
+
   <!-- SKILLS -->
   <section id="skills">
     <div class="wrap">
@@ -472,7 +550,9 @@ footer { padding: 40px 0 56px; color: var(--faint); font-size: .9rem; }
           <div class="tags">
             <span class="tag learning">HTML / CSS</span><span class="tag learning">JavaScript</span>
             <span class="tag learning">Python</span><span class="tag learning">C / C++</span>
-            <span class="tag learning">C#</span><span class="tag learning">Data structures</span><span class="tag learning">Algorithms</span>
+            <span class="tag learning">C#</span><span class="tag learning">TypeScript</span><span class="tag learning">React</span>
+            <span class="tag learning">Node.js</span><span class="tag learning">SQL / PostgreSQL</span><span class="tag learning">Git &amp; GitHub</span>
+            <span class="tag learning">Data structures</span><span class="tag learning">Algorithms</span>
           </div>
         </div>
         <div class="card reveal">
@@ -570,11 +650,10 @@ footer { padding: 40px 0 56px; color: var(--faint); font-size: .9rem; }
   // Theme toggle: remembers the choice; otherwise follows the device setting.
   var root = document.documentElement;
   document.getElementById('theme-btn').addEventListener('click', function () {
-    var dark = root.dataset.theme
-      ? root.dataset.theme === 'dark'
-      : window.matchMedia('(prefers-color-scheme: dark)').matches;
-    root.dataset.theme = dark ? 'light' : 'dark';
-    try { localStorage.setItem('theme', root.dataset.theme); } catch (e) {}
+    var light = root.dataset.theme === 'light';
+    if (light) delete root.dataset.theme; else root.dataset.theme = 'light';
+    try { localStorage.setItem('theme', light ? 'dark' : 'light'); } catch (e) {}
+    window.dispatchEvent(new Event('themechange'));
   });
 
   // Mobile menu
@@ -601,6 +680,108 @@ footer { padding: 40px 0 56px; color: var(--faint); font-size: .9rem; }
   } else {
     items.forEach(function (el) { el.classList.add('in'); });
   }
+
+  // Starfield: twinkling stars at three depths that drift with scrolling, a few
+  // constellation lines, and the odd shooting star. Pauses when the tab is hidden,
+  // and draws a single still frame for visitors who ask for reduced motion.
+  (function () {
+    var cv = document.getElementById('sky');
+    if (!cv || !cv.getContext) return;
+    var ctx = cv.getContext('2d');
+    var still = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var DPR = Math.min(window.devicePixelRatio || 1, 2);
+    var W, H, stars = [], shots = [], raf = null, last = 0, nextShot = 0, mobile;
+    var DARK = ['#FFFFFF', '#FFFFFF', '#FFFFFF', '#CFFBF3', '#BFEFFF', '#FFD9BD', '#D9CCFF'];
+    var LIGHT = ['#0F8F84', '#3B5B66', '#7C5CF6', '#C85A20'];
+    function isLight() { return document.documentElement.dataset.theme === 'light'; }
+
+    function build() {
+      W = window.innerWidth; H = window.innerHeight; mobile = W < 760;
+      cv.width = W * DPR; cv.height = H * DPR;
+      cv.style.width = W + 'px'; cv.style.height = H + 'px';
+      ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+      var n = Math.round(Math.min(mobile ? 110 : 240, (W * H) / 6000));
+      stars = [];
+      for (var i = 0; i < n; i++) {
+        var z = Math.pow(Math.random(), 1.6); // most stars far away, a few close
+        stars.push({
+          x: Math.random() * W, y: Math.random() * H, z: z,
+          r: 0.3 + z * 1.5,
+          tw: Math.random() * 6.283, sp: 0.4 + Math.random() * 1.4,
+          vx: (Math.random() - 0.5) * 0.006 * (0.4 + z),
+          c: Math.floor(Math.random() * 1000)
+        });
+      }
+    }
+
+    function draw(t) {
+      var dt = last ? Math.min(48, t - last) : 16; last = t;
+      var light = isLight(), sy = window.scrollY, pal = light ? LIGHT : DARK;
+      ctx.clearRect(0, 0, W, H);
+      var near = [];
+      for (var i = 0; i < stars.length; i++) {
+        var s = stars[i];
+        if (!still) { s.x += s.vx * dt; s.tw += s.sp * dt * 0.0016; }
+        if (s.x < -4) s.x = W + 4; else if (s.x > W + 4) s.x = -4;
+        var y = ((s.y - sy * (0.04 + s.z * 0.22)) % H + H) % H; // parallax
+        var a = (0.45 + 0.55 * (0.5 + 0.5 * Math.sin(s.tw))) * (0.35 + s.z * 0.65);
+        ctx.globalAlpha = light ? a * 0.4 : a;
+        ctx.fillStyle = pal[s.c % pal.length];
+        ctx.beginPath(); ctx.arc(s.x, y, s.r, 0, 6.283); ctx.fill();
+        if (!light && s.z > 0.75) { // soft glow on the closest stars
+          ctx.globalAlpha = a * 0.06;
+          ctx.beginPath(); ctx.arc(s.x, y, s.r * 2.6, 0, 6.283); ctx.fill();
+        }
+        if (s.z > 0.45) near.push(s.x, y);
+      }
+      if (!mobile) { // faint constellation lines between nearby close stars
+        ctx.strokeStyle = light ? '#0F8F84' : '#7FEFE2'; ctx.lineWidth = 0.6;
+        for (var p = 0; p < near.length; p += 2) {
+          for (var q = p + 2; q < near.length; q += 2) {
+            var dx = near[p] - near[q], dy = near[p + 1] - near[q + 1], d2 = dx * dx + dy * dy;
+            if (d2 < 11000) {
+              ctx.globalAlpha = (light ? 0.05 : 0.09) * (1 - d2 / 11000);
+              ctx.beginPath(); ctx.moveTo(near[p], near[p + 1]); ctx.lineTo(near[q], near[q + 1]); ctx.stroke();
+            }
+          }
+        }
+      }
+      if (!still && !light) {
+        if (!nextShot) nextShot = t + 2500;
+        if (t > nextShot) {
+          var ang = 0.35 + Math.random() * 0.35, spd = 0.9 + Math.random() * 0.6;
+          shots.push({ x: Math.random() * W * 0.8 + W * 0.1, y: Math.random() * H * 0.4, vx: Math.cos(ang) * spd, vy: Math.sin(ang) * spd, life: 0, max: 700 + Math.random() * 500 });
+          nextShot = t + 4500 + Math.random() * 7000;
+        }
+        for (var k = shots.length - 1; k >= 0; k--) {
+          var sh = shots[k]; sh.life += dt; sh.x += sh.vx * dt; sh.y += sh.vy * dt;
+          var f = sh.life / sh.max; if (f >= 1) { shots.splice(k, 1); continue; }
+          var tail = 90 * (1 - f * 0.5), tx = sh.x - sh.vx * tail / 1.2, ty = sh.y - sh.vy * tail / 1.2;
+          var g = ctx.createLinearGradient(sh.x, sh.y, tx, ty);
+          g.addColorStop(0, 'rgba(255,255,255,' + (0.9 * (1 - f)) + ')');
+          g.addColorStop(1, 'rgba(127,239,226,0)');
+          ctx.globalAlpha = 1; ctx.strokeStyle = g; ctx.lineWidth = 1.4;
+          ctx.beginPath(); ctx.moveTo(sh.x, sh.y); ctx.lineTo(tx, ty); ctx.stroke();
+        }
+      }
+      ctx.globalAlpha = 1;
+      if (!still) raf = requestAnimationFrame(draw);
+    }
+
+    build();
+    if (still) { draw(0); } else { raf = requestAnimationFrame(draw); }
+    var rt;
+    window.addEventListener('resize', function () { clearTimeout(rt); rt = setTimeout(function () { build(); if (still) draw(0); }, 200); });
+    if (still) {
+      window.addEventListener('scroll', function () { draw(0); }, { passive: true });
+      window.addEventListener('themechange', function () { draw(0); });
+    }
+    document.addEventListener('visibilitychange', function () {
+      if (still) return;
+      if (document.hidden) { cancelAnimationFrame(raf); raf = null; }
+      else if (!raf) { last = 0; raf = requestAnimationFrame(draw); }
+    });
+  })();
 
   // Highlight the section in view
   var navLinks = Array.prototype.slice.call(document.querySelectorAll('.nav-links a'));
