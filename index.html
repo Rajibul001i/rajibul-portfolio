@@ -150,7 +150,7 @@ header.nav {
 .btn-sm { padding: 9px 16px; font-size: .88rem; }
 
 /* ---------- hero ---------- */
-.hero { padding: 72px 0 40px; }
+.hero { padding: 72px 0 40px; overflow-x: clip; }
 .hero-grid { display: grid; grid-template-columns: 1.25fr .75fr; gap: 56px; align-items: center; }
 .status {
   display: inline-flex; align-items: center; gap: 10px;
@@ -162,13 +162,92 @@ header.nav {
 .hero h1 em { font-style: italic; color: var(--accent); font-weight: 500; }
 .lead { font-size: 1.15rem; color: var(--muted); max-width: 34em; }
 .hero-ctas { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 32px; }
-.portrait { position: relative; justify-self: center; width: min(100%, 340px); }
-.portrait img {
-  width: 100%; height: auto; aspect-ratio: 4 / 5; object-fit: cover; border-radius: 28px;
-  border: 1px solid var(--line); box-shadow: var(--shadow); background: #fff;
+/* 3D portrait: a nebula disc behind, the cut-out photo in front breaking out of the
+   top of the disc, and the award badge nearest. Each layer sits at its own depth, so
+   tilting the stage (mouse on desktop, a slow float on touch) shows real parallax. */
+.portrait { position: relative; justify-self: center; width: min(100%, 360px); perspective: 1100px; }
+.p3d {
+  --rx: 0deg; --ry: 0deg;
+  position: relative; aspect-ratio: 1 / 1.33;
+  transform-style: preserve-3d;
+  transform: rotateX(var(--rx)) rotateY(var(--ry));
+  transition: transform .35s cubic-bezier(.2, .7, .2, 1);
+}
+.p3d.tilting { transition: transform .08s linear; }
+.p3d-disc {
+  position: absolute; left: 0; right: 0; bottom: 0; aspect-ratio: 1; border-radius: 50%;
+  transform: translateZ(-50px);
+  background:
+    radial-gradient(1px 1px at 22% 30%, #fff, transparent), radial-gradient(1px 1px at 70% 22%, #fff, transparent),
+    radial-gradient(1.5px 1.5px at 82% 58%, #CFFBF3, transparent), radial-gradient(1px 1px at 35% 72%, #fff, transparent),
+    radial-gradient(1px 1px at 58% 44%, #FFD9BD, transparent), radial-gradient(1px 1px at 14% 55%, #D9CCFF, transparent),
+    radial-gradient(circle at 30% 28%, rgba(45, 212, 191, .45), transparent 55%),
+    radial-gradient(circle at 75% 78%, rgba(139, 92, 246, .45), transparent 58%),
+    radial-gradient(circle at 80% 20%, rgba(255, 154, 92, .22), transparent 45%),
+    radial-gradient(circle, #0F2A33 0%, #08151C 70%);
+  border: 1px solid rgba(127, 239, 226, .28);
+  box-shadow: 0 0 70px rgba(45, 212, 191, .22), 0 0 140px rgba(139, 92, 246, .14), inset 0 0 60px rgba(0, 0, 0, .55);
+}
+.p3d-orbit {
+  position: absolute; left: -10%; right: -10%; bottom: -8%; aspect-ratio: 1;
+  border-radius: 50%; border: 1px solid rgba(127, 239, 226, .30);
+  transform: translateZ(-20px) rotateX(74deg) rotateZ(-18deg);
+  transform-style: preserve-3d;
+}
+.p3d-orbit::after {
+  content: ''; position: absolute; top: 50%; left: 50%; width: 10px; height: 10px; margin: -5px;
+  border-radius: 50%; background: var(--warm); box-shadow: 0 0 14px 3px rgba(255, 154, 92, .7);
+  offset-path: circle(50%); offset-distance: 0%;
+  animation: orbit 14s linear infinite;
+}
+@keyframes orbit { to { offset-distance: 100%; } }
+.p3d-person {
+  position: absolute; inset: 0;
+  transform: translateZ(40px);
+  /* Visible = the disc circle OR everything above the disc's middle. The head breaks
+     out of the top; below the middle the body is cut to the circle. */
+  -webkit-mask-image: radial-gradient(circle closest-side, #000 99%, transparent 100%), linear-gradient(#000, #000);
+  mask-image: radial-gradient(circle closest-side, #000 99%, transparent 100%), linear-gradient(#000, #000);
+  -webkit-mask-size: 100% 75.19%, 100% 62.4%;
+  mask-size: 100% 75.19%, 100% 62.4%;
+  -webkit-mask-position: bottom center, top center;
+  mask-position: bottom center, top center;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-composite: source-over;
+  mask-composite: add;
+}
+.p3d-person img {
+  position: absolute; top: 4%; left: 7%; width: 86%; height: auto; max-width: none;
+  filter: drop-shadow(0 0 1px rgba(127, 239, 226, .55)) drop-shadow(0 0 18px rgba(45, 212, 191, .28));
+  /* fade the photo's cut-off shoulder edges into the disc */
+  -webkit-mask-image: linear-gradient(to right, transparent 0, #000 13%, #000 87%, transparent 100%);
+  mask-image: linear-gradient(to right, transparent 0, #000 13%, #000 87%, transparent 100%);
+}
+:root[data-theme="light"] .p3d-disc {
+  background:
+    radial-gradient(circle at 30% 28%, rgba(15, 143, 132, .28), transparent 55%),
+    radial-gradient(circle at 75% 78%, rgba(124, 92, 246, .22), transparent 58%),
+    radial-gradient(circle at 80% 20%, rgba(217, 105, 46, .16), transparent 45%),
+    radial-gradient(circle, #FFFFFF 0%, #E9F3F1 75%);
+  border-color: rgba(15, 143, 132, .25);
+  box-shadow: 0 0 60px rgba(15, 143, 132, .16), inset 0 0 40px rgba(15, 143, 132, .08);
+}
+:root[data-theme="light"] .p3d-orbit { border-color: rgba(15, 143, 132, .3); }
+:root[data-theme="light"] .p3d-person img { filter: drop-shadow(0 10px 18px rgba(16, 34, 33, .18)); }
+@media (hover: none), (pointer: coarse) {
+  .p3d { animation: float 7s ease-in-out infinite; }
+}
+@keyframes float {
+  0%, 100% { transform: rotateX(4deg) rotateY(-6deg) translateY(0); }
+  50% { transform: rotateX(-3deg) rotateY(6deg) translateY(-6px); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .p3d, .p3d-orbit::after { animation: none; }
 }
 .award {
-  position: absolute; left: -26px; bottom: 26px;
+  position: absolute; left: -34px; bottom: 2%;
+  transform: translateZ(80px);
   display: flex; align-items: center; gap: 12px;
   background: var(--solid); border: 1px solid var(--line); border-radius: 16px;
   padding: 12px 16px; box-shadow: var(--shadow);
@@ -324,8 +403,9 @@ footer { padding: 40px 0 56px; color: var(--faint); font-size: .9rem; }
   .hero-grid, .about-grid, .contact-box, .edu-grid, .project { grid-template-columns: 1fr; }
   .project-media { position: static; }
   .hero-grid { gap: 48px; }
-  .portrait { order: -1; width: min(100%, 260px); }
-  .award { left: 50%; transform: translateX(-50%); bottom: -22px; white-space: nowrap; }
+  .portrait { order: -1; width: min(100%, 270px); }
+  .p3d-orbit { left: -5%; right: -5%; }
+  .award { left: 50%; transform: translateX(-50%) translateZ(80px); bottom: -22px; white-space: nowrap; }
   .stats { grid-template-columns: repeat(2, 1fr); margin-top: 56px; }
   .stat:nth-child(3) { border-left: 0; }
   .stat:nth-child(n+3) { border-top: 1px solid var(--line); }
@@ -409,14 +489,20 @@ footer { padding: 40px 0 56px; color: var(--faint); font-size: .9rem; }
             </a>
           </div>
         </div>
-        <div class="portrait reveal">
-          <picture>
-            <source srcset="assets/rabbi.webp" type="image/webp">
-            <img src="assets/rabbi.jpg" width="480" height="600" alt="Portrait of Md. Rajibul Islam Rabbi">
-          </picture>
-          <div class="award">
-            <div class="ico" aria-hidden="true">🏆</div>
-            <div><strong>Employee of the Year</strong><span>2025 · Daraz</span></div>
+        <div class="portrait reveal" id="portrait">
+          <div class="p3d" id="p3d">
+            <div class="p3d-disc" aria-hidden="true"></div>
+            <div class="p3d-orbit" aria-hidden="true"></div>
+            <div class="p3d-person">
+              <picture>
+                <source srcset="assets/rabbi-cutout.webp" type="image/webp">
+                <img src="assets/rabbi-cutout.png" width="600" height="894" alt="Portrait of Md. Rajibul Islam Rabbi">
+              </picture>
+            </div>
+            <div class="award">
+              <div class="ico" aria-hidden="true">🏆</div>
+              <div><strong>Employee of the Year</strong><span>2025 · Daraz</span></div>
+            </div>
           </div>
         </div>
       </div>
@@ -780,6 +866,25 @@ footer { padding: 40px 0 56px; color: var(--faint); font-size: .9rem; }
       if (still) return;
       if (document.hidden) { cancelAnimationFrame(raf); raf = null; }
       else if (!raf) { last = 0; raf = requestAnimationFrame(draw); }
+    });
+  })();
+
+  // 3D tilt on the portrait, for a mouse or trackpad
+  (function () {
+    var wrap = document.getElementById('portrait'), stage = document.getElementById('p3d');
+    if (!wrap || !stage) return;
+    if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    wrap.addEventListener('pointermove', function (e) {
+      var b = wrap.getBoundingClientRect();
+      var x = (e.clientX - b.left) / b.width - 0.5, y = (e.clientY - b.top) / b.height - 0.5;
+      stage.classList.add('tilting');
+      stage.style.setProperty('--ry', (x * 18).toFixed(2) + 'deg');
+      stage.style.setProperty('--rx', (-y * 12).toFixed(2) + 'deg');
+    });
+    wrap.addEventListener('pointerleave', function () {
+      stage.classList.remove('tilting');
+      stage.style.setProperty('--ry', '0deg'); stage.style.setProperty('--rx', '0deg');
     });
   })();
 
