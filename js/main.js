@@ -13,6 +13,42 @@
     window.dispatchEvent(new Event('themechange'));
   });
 
+  // Background pause button. The state lives on <html data-sky="paused"> (theme-init.js
+  // restores it before the first paint); both backgrounds read it and listen for
+  // `skychange`. Hidden for reduced-motion visitors, whose background never moves.
+  var skyBtn = document.getElementById('sky-btn');
+  var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (skyBtn) {
+    if (reduced) skyBtn.hidden = true;
+    var showSky = function () {
+      var paused = root.dataset.sky === 'paused';
+      skyBtn.setAttribute('aria-pressed', String(paused));
+      skyBtn.setAttribute('aria-label', paused ? 'Play background animation' : 'Pause background animation');
+    };
+    showSky();
+    skyBtn.addEventListener('click', function () {
+      var paused = root.dataset.sky !== 'paused';
+      if (paused) root.dataset.sky = 'paused'; else delete root.dataset.sky;
+      try { localStorage.setItem('sky', paused ? 'paused' : 'playing'); } catch (e) {}
+      showSky();
+      window.dispatchEvent(new Event('skychange'));
+    });
+  }
+
+  // Dark theme background: the Flow Wave scene (islands/flow-wave.js, Three.js). It is
+  // fetched only when the dark theme is showing, after the page has loaded, so it never
+  // delays the first paint; the CSS nebula shows until it fades in, and stays if WebGL
+  // isn't available.
+  var waveLoaded = false;
+  function loadWave() {
+    if (waveLoaded || root.dataset.theme === 'light' || !document.getElementById('wave')) return;
+    waveLoaded = true;
+    import(new URL('islands/flow-wave.js', document.baseURI).href).catch(function () {});
+  }
+  if (document.readyState === 'complete') loadWave();
+  else window.addEventListener('load', loadWave);
+  window.addEventListener('themechange', loadWave);
+
   // Mobile menu
   var menuBtn = document.getElementById('menu-btn');
   var links = document.getElementById('nav-links');

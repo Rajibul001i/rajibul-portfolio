@@ -2,16 +2,20 @@
 // downloaded up front, layout shift, and drawing cost per frame on a slow phone CPU.
 import { test, expect } from './fixtures.mjs';
 
+// The dark-theme background (islands/flow-wave.js, Three.js) is fetched after the page
+// has loaded, so it is measured on its own below rather than as part of the first load.
+const isWave = (u) => u.endsWith('islands/flow-wave.js');
+
 test('first load stays under 600 KB and does not download the 9 MB video', async ({ page }) => {
   const sizes = new Map();
   page.on('response', async (res) => {
     try { sizes.set(res.url(), (await res.body()).length); } catch { /* range or aborted */ }
   });
   await page.goto('/', { waitUntil: 'networkidle' });
-  const urls = [...sizes.keys()];
+  const urls = [...sizes.keys()].filter((u) => !isWave(u));
   expect(urls.filter((u) => u.endsWith('.mp4'))).toEqual([]);
   expect(urls.filter((u) => u.endsWith('islands/pulsehr-gallery.js')), 'React loads only near Projects').toEqual([]);
-  const total = [...sizes.values()].reduce((a, b) => a + b, 0);
+  const total = urls.reduce((a, u) => a + sizes.get(u), 0);
   console.log(`first load: ${(total / 1024).toFixed(0)} KB in ${urls.length} files`);
   expect(total).toBeLessThan(600 * 1024);
 });
@@ -50,15 +54,16 @@ test('layout does not jump while loading (CLS under 0.1)', async ({ page }) => {
   expect(cls).toBeLessThan(0.1);
 });
 
-// Time spent inside animation-frame callbacks (the starfield's drawing). Unlike raw
+// Time spent inside animation-frame callbacks (the backgrounds' drawing). Unlike raw
 // fps this does not depend on the screen's refresh rate or on other test workers.
-async function frameCost(page, ms = 2000) {
+async function frameCost(page, ms = 2000, wave = false) {
   await page.addInitScript(() => {
     const raf = window.requestAnimationFrame.bind(window);
     window.__frames = [];
     window.requestAnimationFrame = (cb) => raf((t) => { const s = performance.now(); cb(t); window.__frames.push(performance.now() - s); });
   });
   await page.goto('/');
+  if (wave) await expect(page.locator('#wave')).toHaveClass(/\bon\b/, { timeout: 20_000 });
   await page.evaluate(() => { window.__frames.length = 0; });
   return async () => {
     await page.waitForTimeout(ms);
@@ -67,14 +72,6 @@ async function frameCost(page, ms = 2000) {
     return { frames: f.length, avg: f.reduce((a, b) => a + b, 0) / f.length, p95: f[Math.floor(f.length * 0.95)] };
   };
 }
-
-test('drawing the starfield takes under 4 ms a frame (budget is 16 ms for 60 fps)', async ({ page }) => {
-  const done = await frameCost(page);
-  const r = await done();
-  console.log(`starfield: ${r.frames} frames, avg ${r.avg.toFixed(2)} ms, p95 ${r.p95.toFixed(2)} ms`);
-  expect(r.frames).toBeGreaterThan(40);
-  expect(r.avg).toBeLessThan(4);
-});
 
 test('the sunny light-theme background also takes under 4 ms a frame', async ({ page }) => {
   await page.addInitScript(() => { try { localStorage.setItem('theme', 'light'); } catch { /* no storage */ } });
@@ -86,33 +83,78 @@ test('the sunny light-theme background also takes under 4 ms a frame', async ({ 
   expect(r.avg).toBeLessThan(4);
 });
 
-test('stress: on a 4x slower phone CPU while scrolling, frames still fit in 16 ms', async ({ page }) => {
-  await page.setViewportSize({ width: 390, height: 844 });
-  const done = await frameCost(page);
-  const cdp = await page.context().newCDPSession(page);
-  await cdp.send('Emulation.setCPUThrottlingRate', { rate: 4 });
-  await page.evaluate(async () => {
-    for (let i = 0; i < 40; i++) { window.scrollBy(0, 120); await new Promise((r) => setTimeout(r, 50)); }
-  });
-  const r = await done();
-  console.log(`4x CPU throttle + scroll: ${r.frames} frames, avg ${r.avg.toFixed(2)} ms, p95 ${r.p95.toFixed(2)} ms`);
-  expect(r.avg).toBeLessThan(10);
-  expect(r.p95).toBeLessThan(16);
-});
+test.describe('dark-theme background (Flow Wave, WebGL)', () => {
+  test.use({ wave: true });
 
-test('the sky stops drawing when the tab is hidden', async ({ page }) => {
-  await page.goto('/');
-  const drawn = await page.evaluate(() => new Promise((done) => {
-    Object.defineProperty(document, 'hidden', { value: true, configurable: true });
-    Object.defineProperty(document, 'visibilityState', { value: 'hidden', configurable: true });
-    document.dispatchEvent(new Event('visibilitychange'));
-    const c = document.getElementById('sky');
-    setTimeout(() => {
-      const before = c.toDataURL();
-      setTimeout(() => done(c.toDataURL() !== before), 600);
-    }, 100);
-  }));
-  expect(drawn).toBe(false);
+  test('the dark-theme wave loads only after the page, costs under 450 KB, and never loads in the light theme', async ({ page }) => {
+    let bytes = 0;
+    page.on('response', async (res) => { if (isWave(res.url())) bytes = (await res.body()).length; });
+    await page.goto('/');
+    await expect(page.locator('#wave')).toHaveClass(/\bon\b/, { timeout: 20_000 });
+    const t = await page.evaluate(() => ({
+      load: performance.getEntriesByType('navigation')[0].loadEventStart,
+      wave: performance.getEntriesByType('resource').filter((e) => e.name.endsWith('islands/flow-wave.js')).map((e) => e.startTime),
+    }));
+    expect(t.wave, 'requested once').toHaveLength(1);
+    expect(t.wave[0], 'requested after the page has loaded').toBeGreaterThanOrEqual(t.load);
+    console.log(`flow wave: ${(bytes / 1024).toFixed(0)} KB (Three.js and the scene)`);
+    expect(bytes).toBeLessThan(450 * 1024);
+
+    const light = [];
+    await page.addInitScript(() => { try { localStorage.setItem('theme', 'light'); } catch { /* no storage */ } });
+    page.on('request', (r) => isWave(r.url()) && light.push(r.url()));
+    await page.reload({ waitUntil: 'networkidle' });
+    await expect(page.locator('html')).toHaveAttribute('data-theme', 'light');
+    expect(light, 'light-theme visitors never download it').toEqual([]);
+  });
+
+  // The wave is drawn by the graphics card. This measures what it costs the page's own
+  // thread each frame (moving the camera, handing the frame to WebGL); the test machine has
+  // no graphics card, so the drawing itself is slow here and not representative.
+  test('the dark-theme wave takes under 4 ms of script a frame (budget is 16 ms for 60 fps)', async ({ page }) => {
+    const done = await frameCost(page, 2000, true);
+    const r = await done();
+    console.log(`flow wave: ${r.frames} frames, avg ${r.avg.toFixed(2)} ms, p95 ${r.p95.toFixed(2)} ms`);
+    expect(r.frames, 'the wave drew (slowly, in software, on the test machine)').toBeGreaterThan(5);
+    expect(r.avg).toBeLessThan(4);
+  });
+
+  test('stress: on a 4x slower phone CPU while scrolling, frames still fit in 16 ms', async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    const done = await frameCost(page, 2000, true);
+    const cdp = await page.context().newCDPSession(page);
+    await cdp.send('Emulation.setCPUThrottlingRate', { rate: 4 });
+    await page.evaluate(async () => {
+      for (let i = 0; i < 40; i++) { window.scrollBy(0, 120); await new Promise((r) => setTimeout(r, 50)); }
+    });
+    const r = await done();
+    console.log(`4x CPU throttle + scroll: ${r.frames} frames, avg ${r.avg.toFixed(2)} ms, p95 ${r.p95.toFixed(2)} ms`);
+    expect(r.avg).toBeLessThan(10);
+    expect(r.p95).toBeLessThan(16);
+  });
+
+  test('both backgrounds stop drawing when the tab is hidden', async ({ page }) => {
+    const hide = () => page.evaluate(() => {
+      Object.defineProperty(document, 'hidden', { value: true, configurable: true });
+      Object.defineProperty(document, 'visibilityState', { value: 'hidden', configurable: true });
+      document.dispatchEvent(new Event('visibilitychange'));
+    });
+    const frames = (sel) => page.locator(sel).evaluate((c) => Number(c.dataset.frames || 0));
+    await page.goto('/');
+    await expect(page.locator('#wave')).toHaveClass(/\bon\b/, { timeout: 20_000 });
+    await hide();
+    await page.waitForTimeout(150);
+    let a = await frames('#wave'); await page.waitForTimeout(800);
+    expect(await frames('#wave'), 'the wave stops').toBe(a);
+
+    await page.addInitScript(() => { try { localStorage.setItem('theme', 'light'); } catch { /* no storage */ } });
+    await page.reload();
+    await expect.poll(() => frames('#sky')).toBeGreaterThan(2);
+    await hide();
+    await page.waitForTimeout(150);
+    a = await frames('#sky'); await page.waitForTimeout(800);
+    expect(await frames('#sky'), 'the sunny scene stops').toBe(a);
+  });
 });
 
 test('phones never download the Motion library (it only drives the mouse tilt)', async ({ browser, baseURL }) => {
@@ -129,15 +171,17 @@ test('phones never download the Motion library (it only drives the mouse tilt)',
 test('the carousel costs under 400 KB: React, the component and 8 screenshots', async ({ page }) => {
   const sizes = new Map();
   page.on('response', async (res) => {
-    if (!/islands\/|assets\/pulsehr\//.test(res.url())) return;
+    if (!/islands\/|assets\/pulsehr\//.test(res.url()) || isWave(res.url())) return;
     try { sizes.set(res.url(), (await res.body()).length); } catch { /* aborted */ }
   });
   await page.goto('/', { waitUntil: 'networkidle' });
   await page.locator('.screens').scrollIntoViewIfNeeded();
   await expect(page.getByRole('region', { name: 'PulseHR screens' })).toBeVisible();
-  await page.waitForLoadState('networkidle');
+  // (the page went network-idle once already at load, so wait for the files themselves)
+  await expect.poll(() => sizes.size, { message: 'JS, CSS and 8 screenshots arrive' }).toBe(10);
+  await page.waitForTimeout(500);
   const total = [...sizes.values()].reduce((a, b) => a + b, 0);
   console.log(`carousel: ${(total / 1024).toFixed(0)} KB in ${sizes.size} files`);
-  expect(sizes.size).toBe(10); // JS, CSS, 8 screenshots
+  expect(sizes.size, 'and nothing more').toBe(10);
   expect(total).toBeLessThan(400 * 1024);
 });

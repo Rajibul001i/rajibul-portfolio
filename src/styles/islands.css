@@ -13,6 +13,9 @@
 
 @source "../components";
 @source "../islands";
+/* The Flow Wave scene is plain WebGL with no Tailwind classes; scanning it would turn words
+   in its code ("hidden", "paused") into stray utilities. */
+@source not "../islands/flow-wave.ts";
 
 @theme inline {
   --color-background: var(--solid);

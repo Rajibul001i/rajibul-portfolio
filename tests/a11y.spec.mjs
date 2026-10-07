@@ -39,6 +39,32 @@ test('no accessibility problems in the PulseHR screens carousel, in both themes'
   expect(await scan(page)).toEqual([]);
 });
 
+// axe can't judge text cut out of a gradient, so this works it out. The name fades toward
+// its right end; even the ramp's faintest point (the edge of the box, which no letter
+// reaches, so this holds in any font) must reach 3:1, the large-text minimum, in both themes.
+test('the fading name keeps every letter at 3:1 contrast or better', async ({ page }) => {
+  await page.goto('/');
+  const ratios = () => page.evaluate(() => {
+    const lum = (rgb) => {
+      const f = (c) => { c /= 255; return c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4; };
+      return 0.2126 * f(rgb[0]) + 0.7152 * f(rgb[1]) + 0.0722 * f(rgb[2]);
+    };
+    const bg = getComputedStyle(document.body).backgroundColor.match(/[\d.]+/g).map(Number);
+    return [...document.querySelectorAll('.sp-h1, .sp-h2')].map((el) => {
+      const [faint] = [...getComputedStyle(el).backgroundImage.matchAll(/rgba?\(([^)]+)\)/g)].map((m) => m[1].split(',').map(Number));
+      const a = faint[3] ?? 1;
+      const seen = [0, 1, 2].map((i) => faint[i] * a + bg[i] * (1 - a));
+      const [hi, lo] = [lum(seen), lum(bg)].sort((x, y) => y - x);
+      return Math.round(((hi + 0.05) / (lo + 0.05)) * 100) / 100;
+    });
+  });
+  const dark = await ratios();
+  await page.locator('#theme-btn').click();
+  const light = await ratios();
+  console.log(`name contrast at the faint end of its ramp: dark ${dark.join(', ')}; light ${light.join(', ')}`);
+  for (const r of [...dark, ...light]) expect(r).toBeGreaterThanOrEqual(3);
+});
+
 test('skip link is the first Tab stop and jumps to the content', async ({ page }, info) => {
   test.skip(info.project.name === 'phone', 'no keyboard on a phone');
   await page.goto('/');
@@ -82,11 +108,14 @@ test('with reduced motion the sky is still and nothing animates', async ({ brows
   const page = await ctx.newPage();
   await page.route((url) => !url.href.startsWith(baseURL), (route) => route.abort());
   await page.goto('/');
-  await page.waitForTimeout(300);
+  // the wave draws one still frame and stops
+  const wave = page.locator('#wave');
+  await expect(wave).toHaveClass(/\bon\b/, { timeout: 20_000 });
+  const frames = () => wave.evaluate((c) => Number(c.dataset.frames));
+  const a = await frames();
+  await page.waitForTimeout(800);
+  expect(await frames()).toBe(a);
   const frame = () => page.locator('#sky').evaluate((c) => c.toDataURL());
-  const a = await frame();
-  await page.waitForTimeout(700);
-  expect(await frame()).toBe(a);
   const moving = await page.evaluate(() => [...document.querySelectorAll('*')]
     .filter((el) => { const s = getComputedStyle(el); return s.animationName !== 'none' && s.animationPlayState === 'running' && parseFloat(s.animationDuration) > 0.01 && s.animationIterationCount === 'infinite'; })
     .map((el) => el.className));
@@ -98,8 +127,9 @@ test('with reduced motion the sky is still and nothing animates', async ({ brows
   await page.waitForTimeout(700);
   expect(await frame()).toBe(lightA);
   await page.locator('#theme-btn').click();
-  // no entrance animation, no lean on scroll-in, no tilt under the mouse
-  expect(await page.locator('.hero h1 .line').first().evaluate((el) => getComputedStyle(el).animationName)).toBe('none');
+  // no entrance (everything is in place at once), no lean on scroll-in, no tilt under the mouse
+  expect(await page.locator('[data-rise]').evaluateAll((els) => els.map((el) => [getComputedStyle(el).opacity, getComputedStyle(el).transform])))
+    .toEqual([['1', 'none'], ['1', 'none'], ['1', 'none']]);
   const card = page.locator('#skills .card').first();
   await card.scrollIntoViewIfNeeded();
   expect(await card.evaluate((el) => getComputedStyle(el).getPropertyValue('--rv-x'))).toBe('0deg');

@@ -21,6 +21,51 @@
   --radius: 18px;
   --max: 1080px;
   color-scheme: dark;
+
+  /* ── Spotlight (nav + hero), measured in px at a 1920 canvas; the RESPONSIVE block
+     restates them. Fonts map onto the site's own type: Nunito for UI text, Fraunces for
+     the first headline line, and the Playwrite script for the second. */
+  --font-general: 'Nunito', system-ui, sans-serif;
+  --font-onest: 'Nunito', system-ui, sans-serif;
+  --font-display: 'Fraunces', Georgia, serif;
+  --font-script: "Playwrite US Trad", "Snell Roundhand", "Segoe Script", cursive;
+  --nav-inset: 30px;
+  --nav-top: 16px;
+  --nav-h: 62px;
+  --nav-r: 64px;
+  --nav-bg: rgba(255, 255, 255, 0.1);
+  --nav-blur: 8px;
+  --nav-ink: #fff;
+  --nav-line: rgba(255, 255, 255, 0.18);
+  --brand-x: 40px;
+  --brand-gap: 8px;
+  --brand-mark: 18px;
+  --links-gap: 64px;
+  --fs-nav: 24px;
+  --navcta-w: 227px;
+  --navcta-h: 54px;
+  --navcta-inset: 4px;
+  --navcta-pl: 48px;
+  --navcta-pr: 3px;
+  --navcta-icon: 48px;
+  --hero-w: 1020px;
+  --hero-gap: 72px;
+  --head-gap: 16px;
+  --fs-h1a: 72px;
+  --fs-h1b: 128px;
+  /* the faint end is 0.4, not the design's 0.3, so the last letter stays at 3:1 (large text) */
+  /* the faint end is 0.4, not the design's 0.3, so even the last letter keeps 3:1 (large text) */
+  --head-ramp: linear-gradient(to left, rgba(255, 255, 255, 0.4), #fff);
+  --head-bleed: 24px;
+  --cta-gap: 16px;
+  --btn-w: 260px;
+  --btn-h: 71px;
+  --btn-r: 64px;
+  --btn-px: 64px;
+  --btn-pr: 3px;
+  --btn-icon: 65px;
+  --fs-btn: 24px;
+  --ghost-ink: #fff;
 }
 /* light, when chosen with the toggle */
 :root[data-theme="light"] {
@@ -42,12 +87,18 @@
   --shadow: 0 1px 2px rgba(60, 35, 10, .05), 0 8px 28px rgba(60, 35, 10, .08);
   --glow: 0 0 0 transparent;
   --glare: rgba(255, 190, 90, .16);
+  /* Spotlight in the sunny theme: frosted-white glass, warm-brown ink and ramp */
+  --nav-bg: rgba(255, 255, 255, 0.62);
+  --nav-ink: #2A1A0C;
+  --nav-line: rgba(42, 26, 12, 0.14);
+  --head-ramp: linear-gradient(to left, rgba(42, 26, 12, 0.5), #2A1A0C);
+  --ghost-ink: #2A1A0C;
   color-scheme: light;
 }
 
 /* ---------- base ---------- */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-html { scroll-behavior: smooth; scroll-padding-top: 84px; -webkit-text-size-adjust: 100%; }
+html { scroll-behavior: smooth; scroll-padding-top: calc(var(--nav-top) + var(--nav-h) + 16px); -webkit-text-size-adjust: 100%; }
 body {
   font-family: 'Nunito', system-ui, -apple-system, 'Segoe UI', sans-serif;
   background: var(--bg);
@@ -58,7 +109,14 @@ body {
 }
 
 /* ---------- space background ---------- */
-.nebula, #sky { position: fixed; inset: 0; pointer-events: none; z-index: 0; }
+.nebula, #sky, #wave { position: fixed; inset: 0; pointer-events: none; z-index: 0; }
+/* Dark theme: the Flow Wave scene (islands/flow-wave.js) fades in over the nebula. */
+#wave { width: 100vw; height: 100vh; opacity: 0; transition: opacity .8s ease; }
+#wave.on { opacity: 1; }
+.wave-veil { position: fixed; inset: 0; pointer-events: none; z-index: 0; background: var(--bg); opacity: 0; }
+:root[data-theme="light"] #wave, :root[data-theme="light"] .wave-veil { display: none; }
+/* Light theme: the sunny scene (js/sunlight.js). */
+:root:not([data-theme="light"]) #sky { display: none; }
 .nebula {
   background:
     radial-gradient(55vw 50vw at 18% 88%, rgba(0, 222, 200, .10), transparent 60%),
@@ -87,16 +145,22 @@ video:focus, video:focus-within { outline: 2.5px solid var(--accent); outline-of
 .wrap { max-width: var(--max); margin: 0 auto; padding: 0 24px; }
 section { padding: 76px 0; }
 
-/* ---------- nav ---------- */
+/* ---------- nav · the Spotlight glass pill (Figma "Frame 68") ----------
+   Fixed and floating, with the same gutters as the design at every width. Brand at
+   --brand-x, links in the middle, the black CTA flush right with 4px of air. */
 header.nav {
-  position: sticky; top: 0; z-index: 100 !important;
-  background: color-mix(in srgb, var(--bg) 84%, transparent);
-  backdrop-filter: saturate(1.4) blur(14px);
-  -webkit-backdrop-filter: saturate(1.4) blur(14px);
-  border-bottom: 1px solid var(--line);
+  position: fixed; z-index: 100 !important;
+  top: var(--nav-top); left: var(--nav-inset); right: var(--nav-inset);
+  height: var(--nav-h); border-radius: var(--nav-r);
+  display: flex; align-items: center; gap: 12px;
+  padding: 0 var(--navcta-inset) 0 var(--brand-x);
+  background: var(--nav-bg); color: var(--nav-ink);
+  -webkit-backdrop-filter: blur(var(--nav-blur)); backdrop-filter: blur(var(--nav-blur));
 }
+:root[data-theme="light"] header.nav { box-shadow: inset 0 0 0 1px var(--nav-line), 0 8px 28px rgba(60, 35, 10, .08); }
+/* reading progress along the bottom of the pill */
 header.nav::after {
-  content: ''; position: absolute; left: 0; right: 0; bottom: -1px; height: 2px;
+  content: ''; position: absolute; left: 28px; right: 28px; bottom: 0; height: 2px; border-radius: 2px;
   background: linear-gradient(90deg, var(--accent), var(--warm));
   transform-origin: 0 50%; transform: scaleX(0);
 }
@@ -104,31 +168,50 @@ header.nav::after {
   header.nav::after { animation: read-progress linear both; animation-timeline: scroll(root block); }
 }
 @keyframes read-progress { to { transform: scaleX(1); } }
-.nav-inner { display: flex; align-items: center; justify-content: space-between; height: 68px; gap: 16px; }
-.logo { display: inline-flex; align-items: center; min-height: 44px; font-family: 'Fraunces', serif; font-size: 1.35rem; font-weight: 650; text-decoration: none; color: var(--ink); }
-.logo span { color: var(--accent); }
-.nav-links { display: flex; gap: 6px; list-style: none; }
-.nav-links a {
-  text-decoration: none; color: var(--muted); font-size: .92rem; font-weight: 500;
-  padding: 8px 12px; border-radius: 999px; transition: color .2s, background .2s;
+.sp-brand {
+  flex: none; display: flex; align-items: center; gap: var(--brand-gap); min-height: 44px;
+  font-family: var(--font-general); font-weight: 600; font-size: var(--fs-nav); line-height: 1;
+  color: inherit; text-decoration: none;
 }
-.nav-links a:hover, .nav-links a.active { color: var(--ink); background: var(--surface-2); }
-.nav-actions { display: flex; align-items: center; gap: 8px; }
+.sp-mark { width: var(--brand-mark); height: var(--brand-mark); flex: none; }
+.sp-nav-links { flex: 1; min-width: 0; display: flex; justify-content: center; }
+.nav-links { display: flex; gap: var(--links-gap); list-style: none; white-space: nowrap; }
+.nav-links a {
+  display: block; text-decoration: none; color: inherit; opacity: .82;
+  font-family: var(--font-general); font-size: var(--fs-nav); line-height: 1; padding: 8px 0;
+  text-underline-offset: .3em; transition: opacity .2s;
+}
+.nav-links a:hover { opacity: 1; text-decoration: underline; text-decoration-thickness: 1px; }
+.nav-links a.active { opacity: 1; text-decoration: underline; text-decoration-color: var(--accent); text-decoration-thickness: 2px; }
+.nav-actions { flex: none; display: flex; align-items: center; gap: 8px; }
 .icon-btn {
   width: 44px; height: 44px; border-radius: 999px; border: 1px solid var(--line);
   background: var(--surface); color: var(--ink); display: inline-grid; place-items: center;
   cursor: pointer; transition: border-color .2s, scale .12s ease;
 }
+.nav .icon-btn { background: transparent; border-color: var(--nav-line); color: inherit; }
 .icon-btn:active { scale: .92; }
 .sky-btn .play { display: none; }
 .sky-btn[aria-pressed="true"] .play { display: block; }
 .sky-btn[aria-pressed="true"] .pause { display: none; }
-.icon-btn:hover { border-color: var(--accent); }
+.icon-btn:hover, .nav .icon-btn:hover { border-color: var(--accent); }
 .icon-btn svg { width: 18px; height: 18px; }
 .theme-btn .sun { display: none; }
 :root[data-theme="light"] .theme-btn .sun { display: block; }
 :root[data-theme="light"] .theme-btn .moon { display: none; }
 .menu-btn { display: none; }
+/* Nav CTA · Figma "Frame 63" — label at the left pad, the disc flush to the right pad */
+.sp-navcta {
+  flex: none; display: flex; align-items: center; justify-content: space-between; margin-left: 4px;
+  width: var(--navcta-w); height: var(--navcta-h); padding-left: var(--navcta-pl); padding-right: var(--navcta-pr);
+  border-radius: var(--nav-r); background: #000; color: #fff; text-decoration: none;
+  font-family: var(--font-onest); font-weight: 600; font-size: var(--fs-nav); line-height: 1; white-space: nowrap;
+  transition: background-color .2s, scale .12s ease;
+}
+.sp-navcta .sp-disc { width: var(--navcta-icon); height: var(--navcta-icon); }
+.sp-disc { flex: none; display: block; }
+.sp-navcta:hover { background: #1a1a1a; }
+.sp-navcta:active { background: #000; scale: .97; }
 
 /* ---------- buttons ---------- */
 .btn {
@@ -147,23 +230,73 @@ header.nav::after {
 .btn-outline:hover { border-color: var(--accent); transform: translateY(-2px); }
 .btn-sm { padding: 9px 16px; font-size: .88rem; }
 
-/* ---------- hero ---------- */
-.hero { padding: 72px 0 40px; overflow-x: clip; }
-.hero-grid { display: grid; grid-template-columns: 1.25fr .75fr; gap: 56px; align-items: center; }
+/* ---------- hero · the Spotlight composition (Figma "Frame 67") ----------
+   A centred column over the wave: the status pill, the name as a two-line headline cut
+   out of a white ramp, and the pill CTA pair. */
+.hero {
+  position: relative; min-height: 100svh; display: grid; place-items: center;
+  padding: calc(var(--nav-top) + var(--nav-h) + 24px) 0 72px; overflow-x: clip;
+}
+.sp-hero {
+  display: flex; flex-direction: column; align-items: center;
+  width: var(--hero-w); max-width: calc(100% - 2 * var(--nav-inset)); gap: var(--hero-gap);
+}
+.sp-head { display: flex; flex-direction: column; align-items: center; gap: 28px; width: 100%; text-align: center; }
 .status {
   display: inline-flex; align-items: center; gap: 10px;
   font-size: .84rem; font-weight: 600; color: var(--muted); line-height: 1.4;
   background: var(--surface); border: 1px solid var(--line); border-radius: 18px; padding: 7px 14px;
 }
+.hero .status { background: var(--nav-bg); border-color: var(--nav-line); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); }
 .status .dot { width: 8px; height: 8px; flex-shrink: 0; border-radius: 50%; background: var(--warm); box-shadow: 0 0 0 4px var(--warm-soft); }
-.hero h1 { font-size: clamp(2.6rem, 6vw, 4.4rem); margin: 22px 0 18px; }
-.hero h1 em { font-style: italic; color: var(--accent); font-weight: 500; }
-.lead { font-size: 1.15rem; color: var(--muted); max-width: 34em; }
-.hero-ctas { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 32px; }
+.sp-name { display: flex; flex-direction: column; align-items: center; gap: var(--head-gap); width: 100%; font: inherit; letter-spacing: 0; line-height: 1; }
+/* Both lines are the same cut-out: a ramp across the full box, clipped to the glyphs. The
+   box is grown in em (and pulled back by an equal negative margin) so ink outside the
+   line box, like the script face's flourishes, still gets painted. */
+.sp-h1, .sp-h2 {
+  display: block;
+  width: calc(100% + 2 * var(--head-bleed));
+  margin: -0.22em calc(-1 * var(--head-bleed)) -0.62em;
+  padding: 0.22em var(--head-bleed) 0.62em;
+  line-height: 1;
+  background-image: var(--head-ramp);
+  -webkit-background-clip: text; background-clip: text;
+  color: transparent; -webkit-text-fill-color: transparent;
+}
+.sp-h1 { font-family: var(--font-display); font-weight: 500; font-size: var(--fs-h1a); letter-spacing: -.01em; }
+.sp-h2 { font-family: var(--font-script); font-weight: 200; font-style: normal; font-size: var(--fs-h1b); white-space: nowrap; }
+/* CTA row · Figma "Frame 66" */
+.sp-cta { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: var(--cta-gap); }
+.sp-btn {
+  display: flex; align-items: center; width: var(--btn-w); height: var(--btn-h); border-radius: var(--btn-r);
+  font-family: var(--font-onest); font-weight: 600; font-size: var(--fs-btn); line-height: 1;
+  color: #fff; white-space: nowrap; text-decoration: none; transition: background-color .2s, scale .12s ease;
+}
+.sp-btn:active { scale: .97; }
+.sp-btn-solid { justify-content: space-between; padding-left: var(--btn-px); padding-right: var(--btn-pr); background: #000; }
+.sp-btn-solid .sp-disc { width: var(--btn-icon); height: var(--btn-icon); }
+.sp-btn-solid:hover { background: #1a1a1a; }
+.sp-btn-solid:active { background: #000; }
+.sp-btn-ghost { justify-content: center; padding: 3px var(--btn-px); border: 1px solid var(--ghost-ink); color: var(--ghost-ink); }
+.sp-btn-ghost:hover { background: rgba(255, 255, 255, 0.12); }
+.sp-btn-ghost:active { background: rgba(255, 255, 255, 0.04); }
+:root[data-theme="light"] .sp-btn-ghost:hover { background: rgba(42, 26, 12, 0.06); }
+.scroll-cue {
+  position: absolute; left: 50%; bottom: 22px; transform: translateX(-50%);
+  font-size: 11px; font-weight: 600; letter-spacing: .2em; text-transform: uppercase;
+  color: var(--faint); text-decoration: none; padding: 8px;
+}
+.scroll-cue::after { content: ' ↓'; }
+/* Spotlight entry cascade (js/rise.js). Hidden only once JS is on; if rise.js never runs,
+   the fail-safe shows everything after 3 s. */
+.js [data-rise] { opacity: 0; animation: rise-failsafe 0s 3s forwards; }
+.js.lk-js [data-rise] { animation: none; }
+@keyframes rise-failsafe { to { opacity: 1; } }
 /* 3D portrait: the cut-out photo in front of an arch-topped card with a fine grid and
    a thin cyan edge. The head rises just above the card's top edge; the card, the photo
    and the award badge sit at different depths, so tilting the stage shows parallax. */
 .portrait { position: relative; justify-self: center; width: min(100%, 360px); perspective: 1200px; }
+.about-side .portrait { margin: 56px auto 0; }
 .p3d {
   --rx: 0deg; --ry: 0deg;
   position: relative; aspect-ratio: 1 / 1.2;
@@ -432,36 +565,40 @@ footer { padding: 40px 0 56px; color: var(--faint); font-size: .9rem; }
 [data-tilt] .card-ico { transition: transform .5s cubic-bezier(.2, .7, .2, 1); }
 [data-tilt].tilting .card-ico { transform: translateZ(28px); }
 
-/* Hero entrance, once on load: the name rises line by line, the portrait swings round
-   to face the visitor, and the award badge flies in from in front of it. */
-.js .hero h1 .line { display: inline-block; transform-origin: 50% 100%; animation: rise3d 1s cubic-bezier(.2, .75, .2, 1) .1s both; }
-.js .hero h1 em.line { animation-delay: .25s; }
-.js .hero .status { animation: rise .8s cubic-bezier(.2, .7, .2, 1) both; }
-.js .hero .lead { animation: rise .8s cubic-bezier(.2, .7, .2, 1) .45s both; }
-.js .hero .hero-ctas { animation: rise .8s cubic-bezier(.2, .7, .2, 1) .55s both; }
-.js .portrait { animation: swing-in 1.4s cubic-bezier(.2, .7, .2, 1) .15s both; }
-.js .award { animation: award-in 1s cubic-bezier(.2, .75, .25, 1.15) .8s both; }
-@keyframes rise3d { from { opacity: 0; transform: perspective(700px) translateY(.3em) rotateX(-80deg); } }
-@keyframes rise { from { opacity: 0; transform: translateY(14px); } }
-@keyframes swing-in { from { opacity: 0; transform: perspective(1200px) translateZ(-160px) rotateY(-34deg) rotateX(8deg); } }
-@keyframes award-in { from { opacity: 0; transform: var(--award-pos) translateZ(240px) rotateX(-30deg); } }
-
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   .js .reveal { --rv-x: 0deg; --rv-y: 0px; --rv-z: 0px; }
   .reveal, [data-tilt] { transition: border-color .2s; }
-  .js .hero h1 .line, .js .hero .status, .js .hero .lead, .js .hero .hero-ctas, .js .portrait, .js .award { animation: none; }
-  .btn, .icon-btn, .thumbs a { transition: none; }
+  .js [data-rise] { opacity: 1; animation: none; }
+  .btn, .icon-btn, .thumbs a, .sp-btn, .sp-navcta { transition: none; }
   .nav .nav-links, .nav .nav-links.open { transition: none; }
 }
 
 /* ---------- responsive ---------- */
+/* Six links, the pause and theme buttons and the CTA can't all share the pill below
+   these widths: the CTA steps out first (the hero's "Let's talk" leads to contact), then
+   the links move into the menu. */
+@media (max-width: 1100px) {
+  .sp-navcta { display: none; }
+}
 @media (max-width: 900px) {
-  .nav-actions .btn { display: none; } /* room for the menu links; the hero's main button leads to contact */
-  .hero-grid, .about-grid, .contact-box, .edu-grid, .project { grid-template-columns: 1fr; }
+  .nav-links {
+    position: absolute; top: calc(100% + 8px); left: 0; right: 0;
+    flex-direction: column; gap: 2px; padding: 12px 16px 18px; border-radius: 24px;
+    background: var(--solid); color: var(--ink); border: 1px solid var(--line); box-shadow: var(--shadow);
+    visibility: hidden; opacity: 0; transform-origin: 50% 0;
+    transform: perspective(900px) rotateX(-14deg) translateY(-10px) scale(.97);
+    transition: opacity .14s ease-in, transform .14s ease-in, visibility 0s linear .14s;
+  }
+  .nav-links.open {
+    visibility: visible; opacity: 1; transform: none;
+    transition: opacity .2s ease-out, transform .32s cubic-bezier(.2, .8, .2, 1.15), visibility 0s;
+  }
+  .nav-links a { padding: 12px 14px; font-size: 1rem; }
+  .menu-btn { display: inline-grid; }
+  .about-grid, .contact-box, .edu-grid, .project { grid-template-columns: 1fr; }
   .project-media { position: static; }
-  .hero-grid { gap: 48px; }
-  .portrait { order: -1; width: min(100%, 270px); }
+  .portrait { width: min(100%, 270px); }
   .award { --award-pos: translateX(-50%) translateZ(60px); left: 50%; bottom: -22px; white-space: nowrap; }
   .stats { grid-template-columns: repeat(2, 1fr); margin-top: 56px; }
   .stat:nth-child(3) { border-left: 0; }
@@ -471,31 +608,116 @@ footer { padding: 40px 0 56px; color: var(--faint); font-size: .9rem; }
 }
 @media (max-width: 760px) {
   section { padding: 56px 0; }
-  .nav-links {
-    position: absolute; top: 68px; left: 0; right: 0;
-    flex-direction: column; gap: 2px; padding: 12px 16px 18px;
-    background: var(--solid); border-bottom: 1px solid var(--line); box-shadow: var(--shadow);
-    visibility: hidden; opacity: 0; transform-origin: 50% 0;
-    transform: perspective(900px) rotateX(-14deg) translateY(-10px) scale(.97);
-    transition: opacity .14s ease-in, transform .14s ease-in, visibility 0s linear .14s;
-  }
-  .nav-links.open {
-    visibility: visible; opacity: 1; transform: none;
-    transition: opacity .2s ease-out, transform .32s cubic-bezier(.2, .8, .2, 1.15), visibility 0s;
-  }
-  .nav-links a { display: block; padding: 12px 14px; font-size: 1rem; }
-  .menu-btn { display: inline-grid; }
   .skills-grid { grid-template-columns: 1fr; }
   .job { grid-template-columns: 1fr; gap: 12px; padding: 22px; }
   .project { padding: 18px; gap: 22px; }
   .project h3 { font-size: 1.6rem; }
   .screens-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
   .next { grid-template-columns: 1fr; }
-  .hero { padding-top: 40px; }
 }
 @media (max-width: 420px) {
   .wrap { padding: 0 16px; }
   .stat { padding: 16px; }
   .stat b { font-size: 1.4rem; }
   .contact-box { padding: 24px; }
+}
+
+/* ══ Spotlight token steps ═══════════════════════════════════════════
+   The nav and hero are written once against the 1920 design width; every step below only
+   restates their tokens. --fs-h1a keeps Figma's 72:128 ratio to --fs-h1b on phones. */
+@media (max-width: 1600px) {
+  :root {
+    --nav-h: 56px; --brand-x: 32px; --brand-mark: 16px; --links-gap: 44px; --fs-nav: 20px;
+    --navcta-w: 190px; --navcta-h: 48px; --navcta-pl: 40px; --navcta-icon: 42px;
+    --hero-w: 860px; --hero-gap: 58px; --head-gap: 14px; --fs-h1a: 58px; --fs-h1b: 104px;
+    --btn-w: 220px; --btn-h: 62px; --btn-px: 52px; --btn-icon: 56px; --fs-btn: 20px;
+  }
+}
+@media (max-width: 1280px) {
+  :root {
+    --nav-inset: 24px; --nav-top: 14px; --nav-h: 52px; --brand-x: 26px; --links-gap: 30px; --fs-nav: 18px;
+    --navcta-w: 166px; --navcta-h: 44px; --navcta-pl: 30px; --navcta-icon: 38px;
+    --hero-w: 720px; --hero-gap: 48px; --head-gap: 12px; --fs-h1a: 48px; --fs-h1b: 86px;
+    --btn-w: 196px; --btn-h: 56px; --btn-px: 44px; --btn-icon: 50px; --fs-btn: 18px;
+  }
+}
+@media (max-width: 1024px) {
+  :root {
+    --links-gap: 22px; --fs-nav: 16px;
+    --navcta-w: 148px; --navcta-h: 42px; --navcta-pl: 24px; --navcta-icon: 36px;
+    --hero-w: 620px; --hero-gap: 40px; --fs-h1a: 40px; --fs-h1b: 70px;
+    --btn-w: 176px; --btn-h: 52px; --btn-px: 38px; --btn-icon: 46px; --fs-btn: 16px;
+  }
+}
+@media (max-width: 760px) {
+  :root {
+    --nav-inset: 16px; --nav-top: 12px; --nav-h: 48px; --nav-r: 48px; --brand-x: 20px; --brand-mark: 15px; --fs-nav: 16px;
+    --navcta-w: 132px; --navcta-h: 40px; --navcta-pl: 20px; --navcta-icon: 34px;
+    --head-bleed: 12px; --hero-w: 100%; --hero-gap: 36px; --head-gap: 10px; --fs-h1a: 45px; --fs-h1b: 80px;
+    --cta-gap: 14px; --btn-w: 220px; --btn-h: 60px; --btn-r: 48px; --btn-px: 48px; --btn-icon: 54px; --fs-btn: 19px;
+  }
+  .sp-h2 { white-space: normal; }
+}
+@media (max-width: 680px) {
+  :root {
+    --hero-gap: 32px; --head-gap: 9px; --fs-h1a: 39px; --fs-h1b: 70px;
+    --btn-w: 210px; --btn-h: 58px; --btn-px: 46px; --btn-icon: 52px; --fs-btn: 18px;
+  }
+}
+@media (max-width: 600px) {
+  :root {
+    --hero-gap: 27px; --head-gap: 8px; --fs-h1a: 34px; --fs-h1b: 60px;
+    --cta-gap: 12px; --btn-w: 195px; --btn-h: 56px; --btn-px: 42px; --btn-icon: 50px; --fs-btn: 17px;
+  }
+}
+@media (max-width: 520px) {
+  :root {
+    --nav-h: 48px; --brand-x: 16px; --fs-nav: 15px;
+    --navcta-w: 118px; --navcta-h: 38px; --navcta-pl: 16px; --navcta-icon: 32px;
+    --hero-gap: 22px; --head-gap: 6px; --fs-h1a: 28px; --fs-h1b: 50px;
+    --btn-w: 180px; --btn-h: 52px; --btn-px: 38px; --btn-icon: 46px; --fs-btn: 16px;
+  }
+}
+@media (max-width: 440px) {
+  :root {
+    --hero-gap: 20px; --head-gap: 5px; --fs-h1a: 24px; --fs-h1b: 43px;
+    --btn-w: 162px; --btn-h: 50px; --btn-px: 34px; --btn-icon: 44px; --fs-btn: 15px;
+  }
+}
+@media (max-width: 380px) {
+  :root {
+    --hero-gap: 18px; --fs-h1a: 21px; --fs-h1b: 38px;
+    --cta-gap: 10px; --btn-w: 144px; --btn-h: 48px; --btn-px: 30px; --btn-icon: 42px; --fs-btn: 14px;
+  }
+}
+@media (max-width: 340px) {
+  :root {
+    --hero-gap: 16px; --head-gap: 4px; --fs-h1a: 19px; --fs-h1b: 33px;
+    --btn-w: 126px; --btn-h: 44px; --btn-px: 24px; --btn-icon: 38px; --fs-btn: 13px;
+  }
+}
+/* short windows can only step the composition down, never back up */
+@media (max-height: 700px) and (min-width: 1281px) {
+  :root {
+    --nav-h: 56px; --brand-x: 32px; --brand-mark: 16px; --links-gap: 44px; --fs-nav: 20px;
+    --navcta-w: 190px; --navcta-h: 48px; --navcta-pl: 40px; --navcta-icon: 42px;
+    --hero-w: 860px; --hero-gap: 58px; --head-gap: 14px; --fs-h1a: 58px; --fs-h1b: 104px;
+    --btn-w: 220px; --btn-h: 62px; --btn-px: 52px; --btn-icon: 56px; --fs-btn: 20px;
+  }
+}
+@media (max-height: 560px) and (min-width: 1025px) {
+  :root {
+    --nav-h: 52px; --brand-x: 26px; --links-gap: 30px; --fs-nav: 18px;
+    --navcta-w: 166px; --navcta-h: 44px; --navcta-pl: 30px; --navcta-icon: 38px;
+    --hero-w: 720px; --hero-gap: 48px; --head-gap: 12px; --fs-h1a: 48px; --fs-h1b: 86px;
+    --btn-w: 196px; --btn-h: 56px; --btn-px: 44px; --btn-icon: 50px; --fs-btn: 18px;
+  }
+}
+@media (max-height: 460px) and (min-width: 761px) {
+  :root {
+    --links-gap: 22px; --fs-nav: 16px;
+    --navcta-w: 148px; --navcta-h: 42px; --navcta-pl: 24px; --navcta-icon: 36px;
+    --hero-w: 620px; --hero-gap: 40px; --fs-h1a: 40px; --fs-h1b: 70px;
+    --btn-w: 176px; --btn-h: 52px; --btn-px: 38px; --btn-icon: 46px; --fs-btn: 16px;
+  }
 }

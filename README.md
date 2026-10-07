@@ -11,13 +11,14 @@ Each language does one job:
 | File | Language | Job |
 |---|---|---|
 | `index.html` | HTML | Structure and content only. No inline styles or scripts |
-| `css/style.css` | CSS | All styling: colour palette, layout, the 3D portrait card, light theme, phone layouts |
-| `js/theme-init.js` | JavaScript | Applies the saved light/dark choice before the page paints (loaded in `<head>`) |
-| `js/main.js` | JavaScript | Theme toggle, phone menu, reveal on scroll, highlighting the section in view |
-| `js/starfield.js` | JavaScript | The 3D animated background (canvas): a galaxy in the dark theme, sunshine in the light one |
+| `css/style.css` | CSS | All styling: colour palette, the Spotlight nav and hero, layout, the 3D portrait card, light theme, phone layouts |
+| `js/theme-init.js` | JavaScript | Applies the saved light/dark choice (and a paused background) before the page paints (loaded in `<head>`) |
+| `js/main.js` | JavaScript | Theme toggle, background pause button, phone menu, reveal on scroll, highlighting the section in view, loading the islands |
+| `js/rise.js` | JavaScript | The entry cascade: the nav, the name and the buttons spring up into place, 45 ms apart |
+| `js/sunlight.js` | JavaScript | The light theme's animated background (canvas): sun, light rays and floating warm specks |
 | `js/tilt.js` | JavaScript | 3D tilt of the portrait and the cards with the mouse, on springs |
 | `js/vendor/motion.js` | JavaScript | [Motion](https://motion.dev) (MIT), loaded only on devices with a mouse. Refresh with `npm run vendor` after updating the package |
-| `src/` | TypeScript + React + Tailwind | React components (shadcn layout), built into `islands/` |
+| `src/` | TypeScript + React + Tailwind + Three.js | React components (shadcn layout) and the dark theme's WebGL background, built into `islands/` |
 | `islands/` | Built JavaScript + CSS | Output of `npm run build`. Committed, because GitHub Pages serves the repo as-is |
 
 ```
@@ -51,6 +52,7 @@ src/lib/utils.ts                        cn(): clsx + tailwind-merge, used by eve
 src/styles/islands.css                  Tailwind for the islands, mapped to the site's colours
 src/islands/pulsehr-gallery.tsx         mounts the carousel into the page
 src/islands/pulsehr-slides.ts           the eight PulseHR screens and their captions
+src/islands/flow-wave.ts                the dark theme's background: Three.js (r143), no React
 src/demos/                              the component's original demo (dev only, not published)
 ```
 
@@ -58,6 +60,11 @@ Why `src/components/ui`: shadcn components import each other and `cn()` through 
 aliases in `components.json` (`@/components/ui`, `@/lib/utils`). Keeping every one of them
 in that folder means a component added later with `npx shadcn@latest add <name>` lands next
 to this one and its imports resolve without edits.
+
+The dark theme's background is an island too, without React: `src/islands/flow-wave.ts`
+(Three.js) builds into `islands/flow-wave.js`, which `js/main.js` loads after the page has
+finished loading, and only while the dark theme is on. Until it fades in, or where WebGL
+isn't available, the CSS background shows.
 
 Two choices keep React from disturbing the rest of the page:
 
@@ -88,24 +95,31 @@ npx shadcn@latest add <component>
 
 ## Features
 
-- Light theme with its own sunny scene: a bright sun just below the header in the top
-  corner, a warm glow, slow soft light rays across the page, a faint lens flare that shifts
-  as the mouse moves, and specks of warm light floating upward at real depths, like dust in
-  a sunbeam (close ones out of focus), flown through on scroll the same way as the stars
-- 3D starfield (dark theme) in the site's cyan and orange: stars at real depths that you fly through as you
-  scroll, a camera that leans toward the mouse, a sky that turns very slowly, faint
-  constellation lines and the occasional shooting star. Pauses when the tab is hidden
-- 3D portrait: the cut-out photo (from my GitHub profile) rises out of an arch-shaped card,
-  and tilts with the mouse (floats gently on touch screens)
-- 3D motion: on load the name rises line by line, the portrait swings round and the award
-  badge flies in; sections stand up from a slight backward lean as they scroll into view; cards
+- Dark theme background, "Flow Wave" (Three.js, WebGL): hills of glowing cyan points on deep
+  blue that stream toward you. The camera dives toward the surface as you scroll down the page,
+  the cursor parts the points around it, and a soft haze drifts above. Past the first screen the
+  surface dims so the text over it stays easy to read. Stops when the tab is hidden, the theme
+  is light or the pause button is pressed
+- Light theme with its own sunny scene: a bright sun in the top corner below the nav, a warm
+  glow, slow soft light rays across the page, a faint lens flare that shifts as the mouse moves,
+  and specks of warm light floating upward at real depths, like dust in a sunbeam (close ones out
+  of focus), flown through as you scroll
+- Spotlight nav and hero: a floating glass pill nav (frosted white in the light theme) with a
+  black "Say hello" button, the name as a two-line headline (Fraunces, then the Playwrite script)
+  cut out of a white-to-transparent ramp (warm brown in the light theme), and pill buttons with
+  an arrow disc. Every size is a design token, restated at 10 widths and 3 window heights, so it holds from
+  320 px to 1920 px
+- 3D portrait in About: the cut-out photo (from my GitHub profile) rises out of an arch-shaped
+  card, and tilts with the mouse (floats gently on touch screens)
+- Motion: on load the nav, the name and the buttons spring up into place one after another
+  (press R to replay); sections stand up from a slight backward lean as they scroll into view; cards
   lean toward the mouse on springs, with a light that follows it. Content is never hidden while
   it moves, and visitors who turn on reduced motion get a still page
 - Pause button for the moving background, remembered between visits
-- Reading-progress line along the header
+- Reading-progress line along the bottom of the nav
 - Dark theme by default (cyan and orange on deep blue), with a sunny light theme (amber and
   teal on warm cream, warm brown text); the toggle remembers the choice
-- Works on phones, with a menu button below 760 px
+- Works on phones, with a menu button below 900 px
 - Keyboard focus styles, a skip link, and reduced motion for visitors who ask for it
 - Strict Content-Security-Policy: scripts and media load from this site only
 
@@ -117,7 +131,7 @@ npx playwright install chromium
 npm test
 ```
 
-HTML validation, then 105 checks in a real browser on desktop and phone: structure,
+HTML validation, then 111 checks in a real browser on desktop and phone: structure,
 visitor journey, layout at 11 screen widths, accessibility (axe-core, WCAG 2.1 AA, both themes),
 and performance budgets. They run on every push through GitHub Actions. What is
 checked, the results and the bugs they found are in [docs/TESTING.md](docs/TESTING.md). The

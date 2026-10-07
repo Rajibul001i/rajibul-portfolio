@@ -26,7 +26,10 @@ export default defineConfig(({ command }) =>
           emptyOutDir: true,
           modulePreload: false,
           rollupOptions: {
-            input: { "pulsehr-gallery": "src/islands/pulsehr-gallery.tsx" },
+            input: {
+              "pulsehr-gallery": "src/islands/pulsehr-gallery.tsx",
+              "flow-wave": "src/islands/flow-wave.ts",
+            },
             output: {
               format: "es",
               entryFileNames: "[name].js",

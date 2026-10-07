@@ -3,6 +3,24 @@ import { test, expect } from './fixtures.mjs';
 
 const isPhone = (info) => info.project.name === 'phone';
 
+// The dark-theme background (islands/flow-wave.js) is WebGL, so its pixels can't be read
+// back from the page. Instead: take a screenshot and count the bright cyan dots in it.
+// (The test machine has no graphics card; Chromium draws WebGL in software, slowly.)
+async function cyanShare(page) {
+  const png = (await page.screenshot()).toString('base64');
+  return page.evaluate(async (b64) => {
+    const bytes = Uint8Array.from(atob(b64), (c) => c.charCodeAt(0));
+    const img = await createImageBitmap(new Blob([bytes], { type: 'image/png' }));
+    const c = new OffscreenCanvas(img.width, img.height), g = c.getContext('2d');
+    g.drawImage(img, 0, 0);
+    const d = g.getImageData(0, 0, img.width, img.height).data;
+    let n = 0;
+    for (let i = 0; i < d.length; i += 4) if (d[i + 1] > 110 && d[i + 2] > 100 && d[i] < d[i + 1] - 40) n++;
+    return n / (d.length / 4);
+  }, png);
+}
+const waveFrames = (page) => page.locator('#wave').evaluate((c) => Number(c.dataset.frames || 0));
+
 test.beforeEach(async ({ page }) => { await page.goto('/'); });
 
 test('page loads with the name, photo and every section', async ({ page }) => {
@@ -58,16 +76,44 @@ test('theme switch changes colours and is remembered after reload', async ({ pag
   await expect(page.locator('html')).not.toHaveAttribute('data-theme', 'light');
 });
 
-test('starfield is drawing', async ({ page }) => {
-  const canvas = page.locator('#sky');
-  await expect(canvas).toBeAttached();
-  const lit = await canvas.evaluate((c) => {
-    const d = c.getContext('2d').getImageData(0, 0, c.width, c.height).data;
-    let n = 0; for (let i = 3; i < d.length; i += 4) if (d[i] > 0) n++;
-    return n;
+test.describe('dark-theme background (Flow Wave, WebGL)', () => {
+  test.use({ wave: true });
+
+  test('the dark theme background is the glowing cyan wave, and it moves', async ({ page }) => {
+    const wave = page.locator('#wave');
+    await expect(wave, 'the wave fades in once it has drawn').toHaveClass(/\bon\b/, { timeout: 20_000 });
+    await expect(page.locator('#sky'), 'the sunny canvas is off in the dark theme').toBeHidden();
+    const f = await waveFrames(page);
+    await expect.poll(() => waveFrames(page), { timeout: 10_000 }).toBeGreaterThan(f + 3);
+    await expect.poll(() => cyanShare(page), { message: 'cyan dots across the screen', timeout: 10_000 }).toBeGreaterThan(0.01);
   });
-  // most stars are far away and tiny, and a phone shows about a third of them at a time
-  expect(lit).toBeGreaterThan(30);
+
+  test('the background animation can be paused, and stays paused after reload', async ({ page }) => {
+    const btn = page.locator('#sky-btn');
+    const wave = page.locator('#wave');
+    await expect(wave).toHaveClass(/\bon\b/, { timeout: 20_000 });
+    await expect(btn).toHaveAttribute('aria-pressed', 'false');
+    await btn.click();
+    await expect(btn).toHaveAttribute('aria-pressed', 'true');
+    await expect(btn).toHaveAccessibleName('Play background animation');
+    const a = await waveFrames(page); await page.waitForTimeout(800);
+    expect(await waveFrames(page), 'the wave stops').toBe(a);
+    await page.reload();
+    await expect(btn).toHaveAttribute('aria-pressed', 'true');
+    await expect(wave, 'a paused wave still shows its frame').toHaveClass(/\bon\b/, { timeout: 20_000 });
+    const b = await waveFrames(page); await page.waitForTimeout(800);
+    expect(await waveFrames(page)).toBe(b);
+    // the sunny light-theme scene obeys the same button
+    const sun = () => page.locator('#sky').evaluate((c) => c.toDataURL());
+    await page.locator('#theme-btn').click();
+    const s = await sun(); await page.waitForTimeout(600);
+    expect(await sun(), 'the sunny scene stays still while paused').toBe(s);
+    await btn.click();
+    await expect(btn).toHaveAttribute('aria-pressed', 'false');
+    await expect.poll(sun, { message: 'the sunny scene moves again' }).not.toBe(s);
+    await page.locator('#theme-btn').click();
+    await expect.poll(() => waveFrames(page), { message: 'the wave moves again', timeout: 10_000 }).toBeGreaterThan(b + 2);
+  });
 });
 
 test('PulseHR demo video is served so browsers can stream and seek it', async ({ page, request }) => {
@@ -138,41 +184,24 @@ test('cards lean toward the mouse in 3D and settle back when it leaves', async (
   await expect.poll(() => card.evaluate((el) => parseFloat(getComputedStyle(el).getPropertyValue('--tilt-y')))).toBeLessThan(0.1);
 });
 
-test('the hero plays its 3D entrance once and ends fully in place', async ({ page }) => {
-  const line = page.locator('.hero h1 .line').first();
-  expect(await line.evaluate((el) => getComputedStyle(el).animationName)).toBe('rise3d');
-  await page.waitForTimeout(2600);
-  for (const sel of ['.hero h1 .line', '.hero .lead', '.portrait', '.award']) {
-    const st = await page.locator(sel).first().evaluate((el) => ({ o: getComputedStyle(el).opacity, it: getComputedStyle(el).animationIterationCount }));
-    expect(st.o, sel).toBe('1');
-    expect(st.it, sel).toBe('1');
-  }
+test('nav and hero rise in on a spring, in order, and end fully in place (R replays it)', async ({ page }) => {
+  const parts = page.locator('[data-rise]');
+  await expect(parts).toHaveCount(3);
+  const settled = () => parts.evaluateAll((els) => els.every((el) =>
+    !('rising' in el.dataset) && getComputedStyle(el).opacity === '1' && getComputedStyle(el).transform === 'none'));
+  await expect.poll(settled, { timeout: 5_000 }).toBe(true);
+  await page.locator('body').press('r');
+  const start = await parts.evaluateAll((els) => els.map((el) => Number(getComputedStyle(el).opacity)));
+  expect(Math.max(...start), 'replay starts from hidden').toBeLessThan(1);
+  await expect.poll(settled, { timeout: 5_000 }).toBe(true);
 });
 
-test('the first screen has one primary button, and it leads to contact', async ({ page }) => {
-  const primaries = await page.locator('.btn-primary').evaluateAll((els) => els
+test('the first screen has one main button, and it leads to contact', async ({ page }) => {
+  const solid = await page.locator('.hero .sp-btn-solid').evaluateAll((els) => els
     .filter((el) => { const r = el.getBoundingClientRect(); return r.width && r.top < innerHeight && r.bottom > 0; })
     .map((el) => el.getAttribute('href')));
-  expect(primaries).toEqual(['#contact']);
-});
-
-test('the background animation can be paused, and stays paused after reload', async ({ page }) => {
-  const btn = page.locator('#sky-btn');
-  const frame = () => page.locator('#sky').evaluate((c) => c.toDataURL());
-  await expect(btn).toHaveAttribute('aria-pressed', 'false');
-  await btn.click();
-  await expect(btn).toHaveAttribute('aria-pressed', 'true');
-  await expect(btn).toHaveAccessibleName('Play background animation');
-  const a = await frame(); await page.waitForTimeout(600);
-  expect(await frame()).toBe(a);
-  await page.reload();
-  await expect(btn).toHaveAttribute('aria-pressed', 'true');
-  const b = await frame(); await page.waitForTimeout(600);
-  expect(await frame()).toBe(b);
-  await btn.click();
-  await expect(btn).toHaveAttribute('aria-pressed', 'false');
-  await page.waitForTimeout(300);
-  expect(await frame()).not.toBe(b);
+  expect(solid).toEqual(['#contact']);
+  await expect(page.locator('.hero .sp-btn-ghost')).toHaveAttribute('href', '#projects');
 });
 
 test('card tilt runs on springs from the Motion library', async ({ page }, info) => {
@@ -273,9 +302,10 @@ test('light theme has its own animated "sunny" background: a warm glow that move
     return { warm: a ? (r - b) / a : 0, cover: a / (d.length / 4) };
   });
   const dark = await corner();
-  // the dark sky has no sun: the corner is mostly empty (a stray orange star is allowed)
-  expect(dark.cover, 'the dark sky has no glow in the corner').toBeLessThan(5);
+  // in the dark theme the sunny canvas is empty and hidden; the wave shows instead
+  expect(dark.cover, 'no sun in the dark theme').toBe(0);
   await page.locator('#theme-btn').click();
+  await expect(page.locator('#wave'), 'the wave is off in the light theme').toBeHidden();
   await page.waitForTimeout(400);
   const sunny = await corner();
   expect(sunny.warm, 'warm (red well above blue) light in the corner').toBeGreaterThan(60);
@@ -288,14 +318,21 @@ test('light theme has its own animated "sunny" background: a warm glow that move
 test('text colours follow the theme: cool in the dark theme, warm and sunny in the light one', async ({ page }) => {
   const colours = () => page.evaluate(() => {
     const rgb = (el) => getComputedStyle(el).color.match(/\d+/g).slice(0, 3).map(Number);
-    return { body: rgb(document.querySelector('.lead')), name: rgb(document.querySelector('.hero h1 em')), h2: rgb(document.querySelector('#about h2')) };
+    // the name is cut out of a colour ramp: take the ramp's solid end
+    const ramp = (el) => getComputedStyle(el).backgroundImage.match(/rgb\((\d+), (\d+), (\d+)\)/).slice(1).map(Number);
+    return {
+      body: rgb(document.querySelector('.about-text p')), label: rgb(document.querySelector('#about .eyebrow')),
+      h2: rgb(document.querySelector('#about h2')), name: ramp(document.querySelector('.sp-h2')), nav: rgb(document.querySelector('header.nav')),
+    };
   });
   const dark = await colours();
   await page.locator('#theme-btn').click();
   const light = await colours();
   for (const k of Object.keys(dark)) expect(light[k], k).not.toEqual(dark[k]);
   const warm = ([r, , b]) => r > b + 40; // more red than blue: amber, brown
-  expect(warm(dark.name), 'dark-theme name is cyan').toBe(false);
-  expect(warm(light.name), 'light-theme name is amber').toBe(true);
+  expect(warm(dark.label), 'dark-theme labels are cyan').toBe(false);
+  expect(warm(light.label), 'light-theme labels are amber').toBe(true);
+  expect(dark.name, 'dark-theme name is white').toEqual([255, 255, 255]);
+  expect(light.name[0] > light.name[1] && light.name[1] > light.name[2], 'light-theme name is dark warm brown').toBe(true);
   expect(warm(light.body), 'light-theme text is warm brown').toBe(true);
 });
