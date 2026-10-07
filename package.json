@@ -1,0 +1,15 @@
+{
+  "name": "rajibul-portfolio",
+  "private": true,
+  "description": "Tests for the portfolio site. The site itself has no build step.",
+  "scripts": {
+    "test": "npm run validate && npm run test:browser",
+    "validate": "html-validate index.html && node --check js/main.js && node --check js/starfield.js && node --check js/portrait-tilt.js && node --check js/theme-init.js",
+    "test:browser": "playwright test"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "^4.10.0",
+    "@playwright/test": "1.56.1",
+    "html-validate": "^9.0.0"
+  }
+}

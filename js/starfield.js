@@ -9,7 +9,7 @@
   var DPR = Math.min(window.devicePixelRatio || 1, 2);
   var W, H, stars = [], shots = [], raf = null, last = 0, nextShot = 0, mobile;
   var DARK = ['#FFFFFF', '#FFFFFF', '#D6F0EC', '#D6F0EC', '#00DEC8', '#00DEC8', '#FF9A5C'];
-  var LIGHT = ['#00897C', '#3F6966', '#C8571B'];
+  var LIGHT = ['#007A6E', '#3F6966', '#C8571B'];
   function isLight() { return document.documentElement.dataset.theme === 'light'; }
 
   function build() {
@@ -48,7 +48,7 @@
       if (s.z > 0.45) near.push(s.x, y);
     }
     if (!mobile) { // faint constellation lines between nearby close stars
-      ctx.strokeStyle = light ? '#00897C' : '#00DEC8'; ctx.lineWidth = 0.6;
+      ctx.strokeStyle = light ? '#007A6E' : '#00DEC8'; ctx.lineWidth = 0.6;
       for (var p = 0; p < near.length; p += 2) {
         for (var q = p + 2; q < near.length; q += 2) {
           var dx = near[p] - near[q], dy = near[p + 1] - near[q + 1], d2 = dx * dx + dy * dy;

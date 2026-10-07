@@ -23,6 +23,8 @@ assets/favicon.svg         Browser tab icon
 assets/social-card.jpg     Preview image shown when the link is shared
 assets/pulsehr-*.jpg       PulseHR screenshots
 assets/pulsehr-demo.mp4    PulseHR walkthrough video (loads only when played)
+tests/                     Browser tests (Playwright) and the local test server
+docs/TESTING.md            Test plan, results, and bugs found
 ```
 
 No build step. Edit the files and push to `main`; GitHub Pages publishes them.
@@ -36,3 +38,19 @@ No build step. Edit the files and push to `main`; GitHub Pages publishes them.
 - Dark theme by default, with a light theme toggle that remembers the choice
 - Works on phones, with a menu button below 760 px
 - Keyboard focus styles, a skip link, and reduced motion for visitors who ask for it
+- Strict Content-Security-Policy: scripts and media load from this site only
+
+## Tests
+
+```
+npm install
+npx playwright install chromium
+npm test
+```
+
+HTML validation, then 71 checks in a real browser on desktop and phone: structure,
+visitor journey, layout at 11 screen widths, accessibility (axe-core, WCAG 2.1 AA, both themes),
+and performance budgets. They run on every push through GitHub Actions. What is
+checked, the results and the bugs they found are in [docs/TESTING.md](docs/TESTING.md).
+
+The tests need Node.js, but the site itself still has no build step.
