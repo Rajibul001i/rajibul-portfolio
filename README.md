@@ -14,7 +14,7 @@ Each language does one job:
 | `css/style.css` | CSS | All styling: colour palette, layout, the 3D portrait card, light theme, phone layouts |
 | `js/theme-init.js` | JavaScript | Applies the saved light/dark choice before the page paints (loaded in `<head>`) |
 | `js/main.js` | JavaScript | Theme toggle, phone menu, reveal on scroll, highlighting the section in view |
-| `js/starfield.js` | JavaScript | The 3D star background (canvas) |
+| `js/starfield.js` | JavaScript | The 3D animated background (canvas): a galaxy in the dark theme, sunshine in the light one |
 | `js/tilt.js` | JavaScript | 3D tilt of the portrait and the cards with the mouse, on springs |
 | `js/vendor/motion.js` | JavaScript | [Motion](https://motion.dev) (MIT), loaded only on devices with a mouse. Refresh with `npm run vendor` after updating the package |
 | `src/` | TypeScript + React + Tailwind | React components (shadcn layout), built into `islands/` |
@@ -88,7 +88,10 @@ npx shadcn@latest add <component>
 
 ## Features
 
-- 3D starfield in the site's cyan and orange: stars at real depths that you fly through as you
+- Light theme with its own sunny scene: a warm sun glow in the top corner, slow soft light
+  rays, and specks of warm light floating upward at real depths, like dust in a sunbeam,
+  flown through on scroll the same way as the stars
+- 3D starfield (dark theme) in the site's cyan and orange: stars at real depths that you fly through as you
   scroll, a camera that leans toward the mouse, a sky that turns very slowly, faint
   constellation lines and the occasional shooting star. Pauses when the tab is hidden
 - 3D portrait: the cut-out photo (from my GitHub profile) rises out of an arch-shaped card,
@@ -112,7 +115,7 @@ npx playwright install chromium
 npm test
 ```
 
-HTML validation, then 98 checks in a real browser on desktop and phone: structure,
+HTML validation, then 105 checks in a real browser on desktop and phone: structure,
 visitor journey, layout at 11 screen widths, accessibility (axe-core, WCAG 2.1 AA, both themes),
 and performance budgets. They run on every push through GitHub Actions. What is
 checked, the results and the bugs they found are in [docs/TESTING.md](docs/TESTING.md). The

@@ -92,6 +92,12 @@ test('with reduced motion the sky is still and nothing animates', async ({ brows
     .map((el) => el.className));
   expect(moving).toEqual([]);
   await expect(page.locator('#sky-btn')).toBeHidden();
+  // the sunny light theme is still too
+  await page.locator('#theme-btn').click();
+  const lightA = await frame();
+  await page.waitForTimeout(700);
+  expect(await frame()).toBe(lightA);
+  await page.locator('#theme-btn').click();
   // no entrance animation, no lean on scroll-in, no tilt under the mouse
   expect(await page.locator('.hero h1 .line').first().evaluate((el) => getComputedStyle(el).animationName)).toBe('none');
   const card = page.locator('#skills .card').first();

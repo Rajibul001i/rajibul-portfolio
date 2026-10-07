@@ -65,10 +65,11 @@ body {
     #08111A;
 }
 :root[data-theme="light"] .nebula {
+  /* a warm morning sky: sunlit at the top, cooling to the site's pale teal below */
   background:
-    radial-gradient(55vw 50vw at 18% 88%, rgba(0, 137, 124, .08), transparent 60%),
-    radial-gradient(45vw 50vw at 82% 8%, rgba(0, 137, 124, .07), transparent 60%),
-    #F4F8F8;
+    radial-gradient(70vw 60vw at 92% -8%, rgba(255, 196, 110, .26), transparent 62%),
+    radial-gradient(55vw 50vw at 10% 96%, rgba(0, 122, 110, .07), transparent 60%),
+    linear-gradient(180deg, #FBF5EA 0%, #F4F8F8 60%);
 }
 header.nav, main, footer { position: relative; z-index: 1; }
 img { max-width: 100%; display: block; }
@@ -311,8 +312,15 @@ header.nav::after {
 .screens-head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 6px 24px; }
 .screens-head h3 { font-size: 1.3rem; }
 .screens-head p { color: var(--muted); font-size: .92rem; max-width: 40em; }
-.screens-stage { margin-top: 8px; min-height: 360px; }
-.screens-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; padding-top: 16px; }
+/* The stage keeps the carousel's exact height (its card size plus 238px of padding and
+   caption) before and after it loads, so nothing below moves when React swaps it in: a tap
+   on "Contact" in the menu used to land up to 268px off when the swap happened mid-scroll. */
+.screens-stage {
+  --cf-card: clamp(170px, 26vw, 300px);
+  margin-top: 8px; min-height: calc(var(--cf-card) + 240px);
+  display: grid; align-content: center;
+}
+.screens-grid { display: grid; grid-template-columns: repeat(8, minmax(0, 1fr)); gap: 12px; }
 .screens-grid a { display: grid; gap: 6px; text-decoration: none; color: var(--muted); font-size: .85rem; }
 .screens-grid img { width: 100%; height: auto; border-radius: 12px; border: 1px solid var(--line); }
 
@@ -479,7 +487,7 @@ footer { padding: 40px 0 56px; color: var(--faint); font-size: .9rem; }
   .job { grid-template-columns: 1fr; gap: 12px; padding: 22px; }
   .project { padding: 18px; gap: 22px; }
   .project h3 { font-size: 1.6rem; }
-  .screens-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .screens-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
   .next { grid-template-columns: 1fr; }
   .hero { padding-top: 40px; }
 }

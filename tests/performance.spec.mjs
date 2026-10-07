@@ -76,6 +76,16 @@ test('drawing the starfield takes under 4 ms a frame (budget is 16 ms for 60 fps
   expect(r.avg).toBeLessThan(4);
 });
 
+test('the sunny light-theme background also takes under 4 ms a frame', async ({ page }) => {
+  await page.addInitScript(() => { try { localStorage.setItem('theme', 'light'); } catch { /* no storage */ } });
+  const done = await frameCost(page);
+  await expect(page.locator('html')).toHaveAttribute('data-theme', 'light');
+  const r = await done();
+  console.log(`sunny: ${r.frames} frames, avg ${r.avg.toFixed(2)} ms, p95 ${r.p95.toFixed(2)} ms`);
+  expect(r.frames).toBeGreaterThan(40);
+  expect(r.avg).toBeLessThan(4);
+});
+
 test('stress: on a 4x slower phone CPU while scrolling, frames still fit in 16 ms', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   const done = await frameCost(page);

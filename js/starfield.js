@@ -1,8 +1,11 @@
-// Starfield in 3D: stars fill a box of space in front of a camera. The camera drifts
+// Background in 3D, one scene per theme, sharing the same camera.
+// Dark, "galactic": stars fill a box of space in front of a camera. The camera drifts
 // forward slowly, flies forward or back as the page scrolls, leans toward the mouse,
 // and the whole sky turns very slowly. Close stars are bigger, brighter and move more
 // than far ones, which is what makes it read as depth. Also: twinkling, faint
 // constellation lines between close stars, and the odd shooting star.
+// Light, "sunny": a warm sun glow in the top corner with slow, soft light rays, and
+// specks of warm light floating upward at the same depths, like dust in a sunbeam.
 // Pauses when the tab is hidden. Reduced-motion visitors get one still frame, and anyone
 // can stop it with the pause button in the header (remembered for next time).
 (function () {
@@ -16,7 +19,8 @@
   var finePointer = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
   var DPR = Math.min(window.devicePixelRatio || 1, 2);
   var DARK = ['#FFFFFF', '#FFFFFF', '#D6F0EC', '#D6F0EC', '#00DEC8', '#00DEC8', '#FF9A5C'];
-  var LIGHT = ['#007A6E', '#3F6966', '#C8571B'];
+  var SUNNY = ['#E9A23B', '#F0B455', '#E07B4F', '#F5C46A', '#E9A23B', '#5FB3A8'];
+  var RISE = 0.000008;      // light theme: world units per ms the specks float upward
 
   // Depth runs from NEAR (just in front of the camera) to FAR. Stars wrap around in
   // depth, which keeps them evenly spread however far the camera travels.
@@ -31,6 +35,45 @@
   var lookX = 0, lookY = 0, aimX = 0, aimY = 0;        // camera offset, eased toward the mouse
 
   function isLight() { return document.documentElement.dataset.theme === 'light'; }
+
+  // Soft round "bokeh" sprites for the light theme, one per colour, drawn once.
+  var sprites = {};
+  function sprite(color) {
+    if (sprites[color]) return sprites[color];
+    var c = document.createElement('canvas'); c.width = c.height = 64;
+    var g = c.getContext('2d'), rg = g.createRadialGradient(32, 32, 0, 32, 32, 32);
+    rg.addColorStop(0, color); rg.addColorStop(0.35, color + 'CC'); rg.addColorStop(1, color + '00');
+    g.fillStyle = rg; g.fillRect(0, 0, 64, 64);
+    return (sprites[color] = c);
+  }
+
+  // Light theme: the sun just past the top-right corner, a warm glow, and a fan of soft
+  // rays that sway and breathe very slowly.
+  function drawSun(t) {
+    var sx = W * (mobile ? 0.92 : 0.86), sy = -H * 0.06, reach = Math.hypot(W, H) * 1.05;
+    var glow = ctx.createRadialGradient(sx, sy, 0, sx, sy, Math.max(W, H) * 0.7);
+    glow.addColorStop(0, 'rgba(255, 210, 130, 0.50)');
+    glow.addColorStop(0.22, 'rgba(255, 196, 115, 0.20)');
+    glow.addColorStop(1, 'rgba(255, 196, 115, 0)');
+    ctx.globalAlpha = 1; ctx.fillStyle = glow; ctx.fillRect(0, 0, W, H);
+
+    var beam = ctx.createRadialGradient(sx, sy, 0, sx, sy, reach);
+    beam.addColorStop(0, 'rgba(255, 222, 160, 0.30)');
+    beam.addColorStop(0.55, 'rgba(255, 222, 160, 0.08)');
+    beam.addColorStop(1, 'rgba(255, 222, 160, 0)');
+    ctx.fillStyle = beam;
+    for (var i = 0; i < 7; i++) {
+      // rays fan down and to the left, across the page
+      var a = 1.75 + i * 0.2 + Math.sin(t * 0.00012 + i * 1.3) * 0.035;
+      var w = 0.035 + 0.025 * Math.sin(i * 2.1 + 1);
+      ctx.globalAlpha = 0.55 + 0.45 * Math.sin(t * 0.00025 + i * 1.7);
+      ctx.beginPath(); ctx.moveTo(sx, sy);
+      ctx.lineTo(sx + Math.cos(a - w) * reach, sy + Math.sin(a - w) * reach);
+      ctx.lineTo(sx + Math.cos(a + w) * reach, sy + Math.sin(a + w) * reach);
+      ctx.closePath(); ctx.fill();
+    }
+    ctx.globalAlpha = 1;
+  }
 
   function place(s, z) {
     s.x = (Math.random() * 2 - 1) * SX;
@@ -61,7 +104,7 @@
 
   function draw(t) {
     var dt = last ? Math.min(48, t - last) : 16; last = t;
-    var light = isLight(), pal = light ? LIGHT : DARK;
+    var light = isLight(), pal = light ? SUNNY : DARK;
 
     // camera movement
     var dz = 0;
@@ -79,11 +122,17 @@
     var ca = Math.cos(angle), sa = Math.sin(angle), cx = W / 2, cy = H / 2;
 
     ctx.clearRect(0, 0, W, H);
+    if (light) drawSun(t);
     var near = [];
+    // light theme: specks float straight up the screen whichever way the sky has turned
+    var riseX = light && !still ? -RISE * sa * dt : 0, riseY = light && !still ? -RISE * ca * dt : 0;
     for (var i = 0; i < stars.length; i++) {
       var s = stars[i];
       if (!still) {
         s.z -= dz; s.tw += s.sp * dt * 0.0016;
+        s.x += riseX; s.y += riseY;
+        if (s.y < -SY) s.y += 2 * SY; else if (s.y > SY) s.y -= 2 * SY;
+        if (s.x < -SX) s.x += 2 * SX; else if (s.x > SX) s.x -= 2 * SX;
         if (s.z < NEAR) place(s, s.z + DEPTH);
         else if (s.z > FAR) place(s, s.z - DEPTH);
       }
@@ -98,11 +147,14 @@
       var tw = 0.45 + 0.55 * (0.5 + 0.5 * Math.sin(s.tw));
       var a = tw * (0.3 + close * 0.7) * fadeIn * fadeOut;
       var r = Math.min(2.3, 0.22 + 0.32 / s.z);
-      ctx.globalAlpha = light ? a * 0.45 : a;
+      ctx.globalAlpha = light ? Math.min(1, a * 1.15) : a;
       ctx.fillStyle = pal[s.c % pal.length];
 
       var mx = X - s.px, my = Y - s.py, len = Math.hypot(mx, my);
-      if (speed > 0.0005 && s.px !== null && len > r * 2) { // flying fast: a short, faint streak
+      if (light) { // a soft warm speck; near ones are larger and blurrier, like bokeh
+        var d = Math.min(24, 3.5 + 3.4 / s.z);
+        ctx.drawImage(sprite(ctx.fillStyle), X - d / 2, Y - d / 2, d, d);
+      } else if (speed > 0.0005 && s.px !== null && len > r * 2) { // flying fast: a short, faint streak
         var cut = Math.min(1, 18 / len);
         ctx.globalAlpha *= 0.7;
         ctx.strokeStyle = ctx.fillStyle; ctx.lineWidth = r * 1.2; ctx.lineCap = 'round';
@@ -114,13 +166,13 @@
       if (close > 0.62 && fadeOut === 1) near.push(X, Y);
     }
 
-    if (!mobile) { // faint constellation lines between nearby close stars
-      ctx.strokeStyle = light ? '#007A6E' : '#00DEC8'; ctx.lineWidth = 0.6;
+    if (!mobile && !light) { // faint constellation lines between nearby close stars
+      ctx.strokeStyle = '#00DEC8'; ctx.lineWidth = 0.6;
       for (var p = 0; p < near.length; p += 2) {
         for (var q = p + 2; q < near.length; q += 2) {
           var ex = near[p] - near[q], ey = near[p + 1] - near[q + 1], d2 = ex * ex + ey * ey;
           if (d2 < 11000) {
-            ctx.globalAlpha = (light ? 0.05 : 0.08) * (1 - d2 / 11000);
+            ctx.globalAlpha = 0.08 * (1 - d2 / 11000);
             ctx.beginPath(); ctx.moveTo(near[p], near[p + 1]); ctx.lineTo(near[q], near[q + 1]); ctx.stroke();
           }
         }

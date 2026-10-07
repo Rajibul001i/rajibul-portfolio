@@ -17,7 +17,7 @@ if (host && !host.dataset.mounted) {
     <StrictMode>
       <CoverflowCarousel
         slides={PULSEHR_SLIDES}
-        cardWidth="clamp(170px, 26vw, 300px)"
+        cardWidth="clamp(170px, 26vw, 300px)" // keep in step with .screens-stage in css/style.css
         showCaption
         showNavigation
         label="PulseHR screens"

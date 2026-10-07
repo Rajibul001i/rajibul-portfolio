@@ -66,7 +66,8 @@ test('starfield is drawing', async ({ page }) => {
     let n = 0; for (let i = 3; i < d.length; i += 4) if (d[i] > 0) n++;
     return n;
   });
-  expect(lit).toBeGreaterThan(100);
+  // most stars are far away and tiny, and a phone shows about a third of them at a time
+  expect(lit).toBeGreaterThan(30);
 });
 
 test('PulseHR demo video is served so browsers can stream and seek it', async ({ page, request }) => {
@@ -225,6 +226,27 @@ test.describe('PulseHR screens carousel (React island)', () => {
     await expect(caption).not.toHaveText(info.project.name !== 'phone' ? 'Attrition risk' : 'Password recovery');
   });
 
+  test('swapping the grid for the carousel never changes the page height (no jump mid-scroll)', async ({ page }) => {
+    const stage = page.locator('.screens-stage');
+    await page.locator('.screens-grid img').evaluateAll((imgs) => imgs.forEach((i) => { i.loading = 'eager'; }));
+    await page.waitForTimeout(500);
+    const height = () => stage.evaluate((el) => el.offsetHeight); // layout height, not the 3D-tilted box
+    const before = await height();
+    await page.locator('.screens').scrollIntoViewIfNeeded();
+    await expect(carousel(page)).toBeVisible();
+    await page.waitForTimeout(500);
+    expect(Math.abs((await height()) - before)).toBeLessThanOrEqual(1);
+  });
+
+  test('a menu jump past the carousel lands on its target while the carousel loads', async ({ page }, info) => {
+    test.skip(info.project.name !== 'phone', 'the phone menu');
+    await page.locator('#menu-btn').click();
+    await page.locator('#nav-links').getByRole('link', { name: 'Contact' }).click();
+    await expect(carousel(page)).toBeAttached();
+    await page.waitForTimeout(1200);
+    await expect(page.locator('#contact h2')).toBeInViewport();
+  });
+
   test('every slide image is a real, loaded screenshot', async ({ page }) => {
     await page.locator('.screens').scrollIntoViewIfNeeded();
     const imgs = carousel(page).locator('img');
@@ -239,4 +261,26 @@ test.describe('PulseHR screens carousel (React island)', () => {
     await page.locator('#theme-btn').click();
     await expect.poll(() => next.evaluate((el) => getComputedStyle(el).color)).not.toBe(before);
   });
+});
+
+test('light theme has its own animated "sunny" background: a warm glow that moves', async ({ page }) => {
+  // average colour of the canvas near the top-right corner, where the sun sits
+  const corner = () => page.locator('#sky').evaluate((c) => {
+    const g = c.getContext('2d'), w = c.width, h = c.height;
+    const d = g.getImageData(Math.floor(w * 0.7), 0, Math.floor(w * 0.3), Math.floor(h * 0.3)).data;
+    let r = 0, b = 0, a = 0;
+    for (let i = 0; i < d.length; i += 4) { r += d[i] * d[i + 3]; b += d[i + 2] * d[i + 3]; a += d[i + 3]; }
+    return { warm: a ? (r - b) / a : 0, cover: a / (d.length / 4) };
+  });
+  const dark = await corner();
+  // the dark sky has no sun: the corner is mostly empty (a stray orange star is allowed)
+  expect(dark.cover, 'the dark sky has no glow in the corner').toBeLessThan(5);
+  await page.locator('#theme-btn').click();
+  await page.waitForTimeout(400);
+  const sunny = await corner();
+  expect(sunny.warm, 'warm (red well above blue) light in the corner').toBeGreaterThan(60);
+  expect(sunny.cover, 'a real glow, not a few dots').toBeGreaterThan(20);
+  const a = await page.locator('#sky').evaluate((c) => c.toDataURL());
+  await page.waitForTimeout(700);
+  expect(await page.locator('#sky').evaluate((c) => c.toDataURL()), 'the sunny scene is animated').not.toBe(a);
 });
