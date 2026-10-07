@@ -103,7 +103,8 @@ npx shadcn@latest add <component>
   it moves, and visitors who turn on reduced motion get a still page
 - Pause button for the moving background, remembered between visits
 - Reading-progress line along the header
-- Dark theme by default, with a light theme toggle that remembers the choice
+- Dark theme by default (cyan and orange on deep blue), with a sunny light theme (amber and
+  teal on warm cream, warm brown text); the toggle remembers the choice
 - Works on phones, with a menu button below 760 px
 - Keyboard focus styles, a skip link, and reduced motion for visitors who ask for it
 - Strict Content-Security-Policy: scripts and media load from this site only

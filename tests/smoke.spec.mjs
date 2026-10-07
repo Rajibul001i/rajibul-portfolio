@@ -284,3 +284,18 @@ test('light theme has its own animated "sunny" background: a warm glow that move
   await page.waitForTimeout(700);
   expect(await page.locator('#sky').evaluate((c) => c.toDataURL()), 'the sunny scene is animated').not.toBe(a);
 });
+
+test('text colours follow the theme: cool in the dark theme, warm and sunny in the light one', async ({ page }) => {
+  const colours = () => page.evaluate(() => {
+    const rgb = (el) => getComputedStyle(el).color.match(/\d+/g).slice(0, 3).map(Number);
+    return { body: rgb(document.querySelector('.lead')), name: rgb(document.querySelector('.hero h1 em')), h2: rgb(document.querySelector('#about h2')) };
+  });
+  const dark = await colours();
+  await page.locator('#theme-btn').click();
+  const light = await colours();
+  for (const k of Object.keys(dark)) expect(light[k], k).not.toEqual(dark[k]);
+  const warm = ([r, , b]) => r > b + 40; // more red than blue: amber, brown
+  expect(warm(dark.name), 'dark-theme name is cyan').toBe(false);
+  expect(warm(light.name), 'light-theme name is amber').toBe(true);
+  expect(warm(light.body), 'light-theme text is warm brown').toBe(true);
+});

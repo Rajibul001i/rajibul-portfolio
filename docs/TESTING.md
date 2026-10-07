@@ -21,7 +21,7 @@ npm test
 ```
 
 `npm test` validates the HTML and JavaScript, starts a small local server
-(`tests/server.mjs`), and runs 105 browser checks: 74 on a desktop screen (1366×800) and 31
+(`tests/server.mjs`), and runs 107 browser checks: 75 on a desktop screen (1366×800) and 32
 on a phone (Pixel 7). `npm run validate` also type-checks the React code (`tsc`), and CI
 rebuilds `islands/` and fails if the committed copy differs. Every browser test runs offline, and a test fails if the page logs a
 JavaScript error, breaks the Content-Security-Policy, or requests a file that doesn't exist.
@@ -42,11 +42,13 @@ JavaScript error, breaks the Content-Security-Policy, or requests a file that do
 - Regression: the old admin PIN, passwords, API keys and the fake visitor counter stay removed
 - Page basics: language, title, description, viewport, favicon; the photo is not embedded in the HTML
 
-**Visitor journey (23 per device)**
+**Visitor journey (24 per device)**
 - Name, photo and every section load; the footer shows the current year
 - Menu links scroll to their section and highlight it; the phone menu opens, closes with
   Escape and closes after a link is picked
 - The theme switch changes the colours and is remembered after a reload
+- Text colours follow the theme: cyan and cool in the dark theme, amber and warm brown in the
+  sunny light theme
 - The light theme has its own animated sunny background: warm light in the top corner that
   moves (the dark sky has none)
 - The starfield is drawing
@@ -92,10 +94,10 @@ JavaScript error, breaks the Content-Security-Policy, or requests a file that do
 
 ## Results
 
-Run on 7 October 2026, Chromium 141 (Playwright 1.56.1), after adding the sunny light theme:
+Run on 7 October 2026, Chromium 141 (Playwright 1.56.1), after giving the sunny light theme its own text colours:
 
-**95 passed, 10 skipped, 0 failed**, five times in a row with `npm test` (the same command CI
-runs), after fixing the two intermittent failures below. The skips are by design: phone-only checks skipped on desktop,
+**97 passed, 10 skipped, 0 failed**, three times in a row with `npm test` (the same command CI
+runs). The two intermittent failures below were fixed earlier. The skips are by design: phone-only checks skipped on desktop,
 keyboard and mouse checks skipped on the phone, and video playback, which needs the H.264 codec that
 Playwright's open-source Chromium leaves out. Chrome, Edge, Safari and Firefox all have it.
 
