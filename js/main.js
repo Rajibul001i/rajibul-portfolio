@@ -39,6 +39,19 @@
   }
 
 
+  // React islands: load the PulseHR screens carousel (islands/, built from src/) only
+  // when its section comes within a screen or so, so the first load stays small. Until
+  // then, and if it fails or JavaScript is off, the plain screenshot grid shows.
+  var island = document.querySelector('[data-island="pulsehr-gallery"]');
+  if (island && 'IntersectionObserver' in window) {
+    var load = new IntersectionObserver(function (entries) {
+      if (!entries.some(function (en) { return en.isIntersecting; })) return;
+      load.disconnect();
+      import(new URL('islands/pulsehr-gallery.js', document.baseURI).href).catch(function () {});
+    }, { rootMargin: '900px 0px' });
+    load.observe(island);
+  }
+
   // Highlight the section in view
   var navLinks = Array.prototype.slice.call(document.querySelectorAll('.nav-links a'));
   if ('IntersectionObserver' in window) {

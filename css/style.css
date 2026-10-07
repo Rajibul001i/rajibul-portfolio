@@ -306,6 +306,16 @@ header.nav::after {
 .project .tags { margin-top: 16px; }
 .project-links { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 22px; }
 
+/* ---------- PulseHR screens (3D carousel from islands/, plain grid before it loads) ---------- */
+.screens { margin-top: 28px; }
+.screens-head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 6px 24px; }
+.screens-head h3 { font-size: 1.3rem; }
+.screens-head p { color: var(--muted); font-size: .92rem; max-width: 40em; }
+.screens-stage { margin-top: 8px; min-height: 360px; }
+.screens-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; padding-top: 16px; }
+.screens-grid a { display: grid; gap: 6px; text-decoration: none; color: var(--muted); font-size: .85rem; }
+.screens-grid img { width: 100%; height: auto; border-radius: 12px; border: 1px solid var(--line); }
+
 /* ---------- cards / skills ---------- */
 .skills-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; }
 .card {
@@ -469,6 +479,7 @@ footer { padding: 40px 0 56px; color: var(--faint); font-size: .9rem; }
   .job { grid-template-columns: 1fr; gap: 12px; padding: 22px; }
   .project { padding: 18px; gap: 22px; }
   .project h3 { font-size: 1.6rem; }
+  .screens-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .next { grid-template-columns: 1fr; }
   .hero { padding-top: 40px; }
 }

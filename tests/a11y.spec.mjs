@@ -29,6 +29,16 @@ test('no accessibility problems with the phone menu open', async ({ page }, info
   expect(await scan(page)).toEqual([]);
 });
 
+test('no accessibility problems in the PulseHR screens carousel, in both themes', async ({ page }) => {
+  await page.goto('/');
+  await page.locator('.screens').scrollIntoViewIfNeeded();
+  await expect(page.getByRole('region', { name: 'PulseHR screens' })).toBeVisible();
+  await page.waitForTimeout(600);
+  expect(await scan(page)).toEqual([]);
+  await page.locator('#theme-btn').click();
+  expect(await scan(page)).toEqual([]);
+});
+
 test('skip link is the first Tab stop and jumps to the content', async ({ page }, info) => {
   test.skip(info.project.name === 'phone', 'no keyboard on a phone');
   await page.goto('/');

@@ -21,13 +21,14 @@ npm test
 ```
 
 `npm test` validates the HTML and JavaScript, starts a small local server
-(`tests/server.mjs`), and runs 84 browser checks: 61 on a desktop screen (1366×800) and 23
-on a phone (Pixel 7). Every browser test runs offline, and a test fails if the page logs a
+(`tests/server.mjs`), and runs 98 browser checks: 70 on a desktop screen (1366×800) and 28
+on a phone (Pixel 7). `npm run validate` also type-checks the React code (`tsc`), and CI
+rebuilds `islands/` and fails if the committed copy differs. Every browser test runs offline, and a test fails if the page logs a
 JavaScript error, breaks the Content-Security-Policy, or requests a file that doesn't exist.
 
 ## What is checked
 
-**Structure (17, run once)**
+**Structure (20, run once)**
 - HTML holds structure only: no `<style>`, no `style=""`, no inline scripts or `onclick=`
 - Every local file the page refers to exists; every `#link` has a target; ids are unique
 - The link-preview image is a real file in the repo
@@ -36,10 +37,12 @@ JavaScript error, breaks the Content-Security-Policy, or requests a file that do
 - Scripts never build HTML from strings (no `innerHTML`, `eval`)
 - Icons are SVG, not emoji (emoji look different on every phone)
 - The bundled copy of the Motion library is identical to the installed package
+- The carousel's 8 screenshots exist; the island's Tailwind classes never match a class the
+  page uses; the island CSS contains no Tailwind reset
 - Regression: the old admin PIN, passwords, API keys and the fake visitor counter stay removed
 - Page basics: language, title, description, viewport, favicon; the photo is not embedded in the HTML
 
-**Visitor journey (16 per device)**
+**Visitor journey (20 per device)**
 - Name, photo and every section load; the footer shows the current year
 - Menu links scroll to their section and highlight it; the phone menu opens, closes with
   Escape and closes after a link is picked
@@ -54,6 +57,9 @@ JavaScript error, breaks the Content-Security-Policy, or requests a file that do
 - The first screen has exactly one primary button, and it leads to contact
 - The background animation can be paused, stays paused after a reload, and plays again
 - Card tilt runs on springs from the Motion library
+- PulseHR screens carousel: React loads only when Projects comes near and replaces the plain
+  grid; arrows, arrow keys and dragging change the screen and the caption follows; it loops;
+  all 8 screenshots load; it follows the light theme; without JavaScript the grid shows
 
 **Layout (13)**
 - No sideways scrolling and nothing poking out of the screen at 11 widths from 320 to
@@ -61,14 +67,16 @@ JavaScript error, breaks the Content-Security-Policy, or requests a file that do
 - Header buttons, the logo and "Back to top" are at least 44 px to tap; name, photo and buttons fit on the first phone screen
 
 **Accessibility (7 per device)**
-- axe-core finds nothing in the dark theme, the light theme, or with the phone menu open
+- axe-core finds nothing in the dark theme, the light theme, with the phone menu open, or in
+  the loaded carousel (both themes)
 - The skip link is the first Tab stop; every Tab stop shows a focus ring
 - Headings go in order (one `h1`, no skipped levels)
 - With reduced motion turned on, the sky is still, nothing animates, there is no hero entrance,
   sections don't lean in, cards don't tilt, and the (pointless) pause button is hidden
 
-**Performance (8)**
-- First load stays under 600 KB and never downloads the 9 MB video
+**Performance (9)**
+- First load stays under 600 KB, never downloads the 9 MB video, and doesn't load React
+- The carousel costs under 400 KB (React, the component and 8 screenshots), loaded on approach
 - The photo loads as WebP, not the heavier PNG
 - DOM ready under 1.5 s, largest paint under 2.5 s, layout shift under 0.1
 - Drawing the starfield takes under 4 ms a frame; on a 4x slower phone CPU while scrolling,
@@ -78,16 +86,16 @@ JavaScript error, breaks the Content-Security-Policy, or requests a file that do
 
 ## Results
 
-Run on 7 October 2026, Chromium 141 (Playwright 1.56.1), after the UI UX Pro Max review
-(see [DESIGN-REVIEW.md](DESIGN-REVIEW.md)):
+Run on 7 October 2026, Chromium 141 (Playwright 1.56.1), after adding the React carousel:
 
-**75 passed, 9 skipped, 0 failed.** The skips are by design: phone-only checks skipped on desktop,
+**89 passed, 9 skipped, 0 failed.** The skips are by design: phone-only checks skipped on desktop,
 keyboard and mouse checks skipped on the phone, and video playback, which needs the H.264 codec that
 Playwright's open-source Chromium leaves out. Chrome, Edge, Safari and Firefox all have it.
 
 | Measurement | Result | Budget |
 |---|---|---|
-| First load, desktop (includes Motion, 144 KB) | 428 KB in 11 files | 600 KB |
+| First load, desktop (includes Motion, 144 KB) | 425 KB in 14 files | 600 KB |
+| PulseHR carousel, loaded on approach | 338 KB in 10 files (React bundle 184 KB, 59 KB gzipped) | 400 KB |
 | First load, phone (no Motion; screenshots below the fold not yet fetched) | 186 KB in 8 files | 600 KB |
 | DOM ready | 118–167 ms | 1.5 s |
 | Largest paint | 160–228 ms | 2.5 s |
@@ -109,6 +117,7 @@ Playwright's open-source Chromium leaves out. Chrome, Edge, Safari and Firefox a
 | P-9 | Layout test | The new pause button made the header 53 px too wide between 761 and 900 px | The header "Say hello" button hides below 900 px (the hero's main button leads to contact); checked every 7 px from 300 to 1100 px |
 | P-10 | Reduced-motion test | The pause button stayed visible for reduced-motion visitors because `display: inline-grid` overrode the `hidden` attribute | `[hidden] { display: none !important }` |
 | P-11 | Layout test | The phone menu's closed 3D pose was 1 px wider than the screen | Slight scale-down in the closed pose |
+| P-12 | Demo check | The shadcn demo page rendered unstyled: its dev server only scanned `src/demos/` for Tailwind classes | `@source "../components"` in the demo CSS |
 | P-8 | Layout test | The new 3D scroll reveal swung the bottom of the tall project card toward the viewer, making the page 1–6 px wider than a phone screen | Large blocks hinge on their bottom edge, so no part comes forward |
 
 The colour changes are small shifts of the same teal and grey, so the theme looks the same.

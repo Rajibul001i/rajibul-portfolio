@@ -28,7 +28,7 @@ test.describe('HTML is only for structure', () => {
 
 test.describe('every reference resolves', () => {
   test('every local file the page points to exists', () => {
-    const refs = [...allSource.matchAll(/(?:src|href|srcset|poster|content)="((?:assets|css|js)\/[^"#?]+)"/g)].map((m) => m[1]);
+    const refs = [...allSource.matchAll(/(?:src|href|srcset|poster|content)="((?:assets|css|js|islands)\/[^"#?]+)"/g)].map((m) => m[1]);
     const cssRefs = [...css.matchAll(/url\(["']?((?:\.\.\/)?assets\/[^"')]+)["']?\)/g)].map((m) => m[1].replace('../', ''));
     const missing = [...new Set([...refs, ...cssRefs])].filter((r) => !existsSync(root + r));
     expect(missing).toEqual([]);
@@ -90,6 +90,23 @@ test.describe('content and safety', () => {
     const vendored = readFileSync(root + 'js/vendor/motion.js', 'utf8');
     expect(vendored.split('\n')[0]).toContain(`Motion ${pkg.version} | MIT License`);
     expect(vendored.slice(vendored.indexOf('\n') + 1)).toBe(readFileSync(root + 'node_modules/motion/dist/motion.js', 'utf8'));
+  });
+  test('carousel screenshots referenced by the React island exist', () => {
+    const slides = readFileSync(root + 'src/islands/pulsehr-slides.ts', 'utf8');
+    const names = [...slides.matchAll(/shot\("([^"]+)"\)/g)].map((m) => m[1]);
+    expect(names.length).toBe(8);
+    expect(names.filter((n) => !existsSync(root + `assets/pulsehr/${n}.webp`))).toEqual([]);
+  });
+  test("the island's Tailwind classes never clash with the page's own class names", () => {
+    const islandCss = readFileSync(root + 'islands/pulsehr-gallery.css', 'utf8');
+    const tw = new Set([...islandCss.matchAll(/\.((?:[a-z0-9-]|\\.)+)/g)].map((m) => m[1].replace(/\\/g, '')));
+    const used = new Set([...html.matchAll(/class="([^"]+)"/g)].flatMap((m) => m[1].split(/\s+/)));
+    expect([...used].filter((c) => tw.has(c))).toEqual([]);
+  });
+  test("the island CSS has no Tailwind reset (it would restyle the whole page)", () => {
+    const islandCss = readFileSync(root + 'islands/pulsehr-gallery.css', 'utf8');
+    expect(islandCss).not.toMatch(/(^|[}\s])(html|body|\*)\s*,?[^{]*\{[^}]*margin:0/);
+    expect(islandCss).not.toContain('-webkit-text-size-adjust');
   });
   test('the photo is a separate file, not embedded in the HTML', () => {
     expect(html).not.toMatch(/data:image\//);

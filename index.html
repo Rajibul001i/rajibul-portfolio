@@ -20,6 +20,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,650;1,9..144,500&family=Nunito:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="islands/pulsehr-gallery.css">
 <script src="js/theme-init.js"></script>
 <script src="js/main.js" defer></script>
 <script src="js/starfield.js" defer></script>
@@ -178,12 +179,8 @@
           <video controls preload="none" playsinline poster="assets/pulsehr-dashboard.jpg" aria-label="PulseHR demo video, with narration">
             <source src="assets/pulsehr-demo.mp4" type="video/mp4">
           </video>
-          <div class="thumbs">
-            <a href="assets/pulsehr-dashboard.jpg" target="_blank" rel="noopener"><img src="assets/pulsehr-dashboard.jpg" loading="lazy" width="1280" height="800" alt="PulseHR HR dashboard listing employees at risk of leaving"></a>
-            <a href="assets/pulsehr-roster.jpg" target="_blank" rel="noopener"><img src="assets/pulsehr-roster.jpg" loading="lazy" width="1280" height="800" alt="PulseHR employee view with today's duty time and a 14-day roster"></a>
-            <a href="assets/pulsehr-recovery.jpg" target="_blank" rel="noopener"><img src="assets/pulsehr-recovery.jpg" loading="lazy" width="1280" height="800" alt="PulseHR password recovery, step three: SMS code"></a>
-          </div>
-          <p class="media-note">4-minute walkthrough as HR, a manager and an employee. Click a screenshot to enlarge.</p>
+
+          <p class="media-note">4-minute walkthrough as HR, a manager and an employee.</p>
         </div>
         <div class="project-body">
           <div class="project-top"><span class="pill accent">University project · Team lead</span><span class="pill">2026</span></div>
@@ -208,6 +205,25 @@
           </div>
         </div>
       </article>
+      <div class="screens reveal">
+        <div class="screens-head">
+          <h3>Inside PulseHR</h3>
+          <p>Eight screens from the three roles. Drag the cards, use the arrows, or focus the carousel and press ← →.</p>
+        </div>
+        <div class="screens-stage" data-island="pulsehr-gallery">
+          <!-- A plain grid until the 3D carousel (islands/) loads, and for visitors without JavaScript -->
+          <div class="screens-grid">
+            <a href="assets/pulsehr/hr-dashboard.webp" target="_blank" rel="noopener"><img src="assets/pulsehr/hr-dashboard.webp" loading="lazy" width="600" height="600" alt="PulseHR HR dashboard: employees ranked by attrition-risk score"><span>Attrition risk</span></a>
+            <a href="assets/pulsehr/hr-why.webp" target="_blank" rel="noopener"><img src="assets/pulsehr/hr-why.webp" loading="lazy" width="600" height="600" alt="PulseHR risk score breakdown with the factors behind a score"><span>Why this score</span></a>
+            <a href="assets/pulsehr/hr-payslips.webp" target="_blank" rel="noopener"><img src="assets/pulsehr/hr-payslips.webp" loading="lazy" width="600" height="600" alt="PulseHR payroll by department in taka"><span>Payroll</span></a>
+            <a href="assets/pulsehr/hr-people.webp" target="_blank" rel="noopener"><img src="assets/pulsehr/hr-people.webp" loading="lazy" width="600" height="600" alt="PulseHR people directory"><span>People</span></a>
+            <a href="assets/pulsehr/mgr-shifts.webp" target="_blank" rel="noopener"><img src="assets/pulsehr/mgr-shifts.webp" loading="lazy" width="600" height="600" alt="PulseHR shifts and assigning people to them"><span>Shifts</span></a>
+            <a href="assets/pulsehr/mgr-leave.webp" target="_blank" rel="noopener"><img src="assets/pulsehr/mgr-leave.webp" loading="lazy" width="600" height="600" alt="PulseHR leave balances and request form"><span>Leave</span></a>
+            <a href="assets/pulsehr/emp-attendance.webp" target="_blank" rel="noopener"><img src="assets/pulsehr/emp-attendance.webp" loading="lazy" width="600" height="600" alt="PulseHR employee attendance: today's duty and the next two weeks"><span>My attendance</span></a>
+            <a href="assets/pulsehr/recovery.webp" target="_blank" rel="noopener"><img src="assets/pulsehr/recovery.webp" loading="lazy" width="600" height="600" alt="PulseHR password reset, step one of four"><span>Password recovery</span></a>
+          </div>
+        </div>
+      </div>
     </div>
   </section>
 

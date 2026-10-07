@@ -119,6 +119,7 @@ test('page still shows everything with JavaScript turned off', async ({ browser,
   const hidden = await p.locator('.reveal').evaluateAll((els) => els.filter((el) => getComputedStyle(el).opacity !== '1').length);
   expect(hidden).toBe(0);
   await expect(p.locator('#contact')).toBeVisible();
+  await expect(p.locator('.screens-grid img')).toHaveCount(8); // the carousel's plain fallback
   await ctx.close();
 });
 
@@ -181,4 +182,61 @@ test('card tilt runs on springs from the Motion library', async ({ page }, info)
   const box = await card.boundingBox();
   await page.mouse.move(box.x + box.width * 0.8, box.y + box.height * 0.2, { steps: 4 });
   await expect(card).toHaveClass(/sprung/);
+});
+
+test.describe('PulseHR screens carousel (React island)', () => {
+  const carousel = (page) => page.getByRole('region', { name: 'PulseHR screens' });
+
+  test('loads only when Projects comes near, then replaces the plain grid', async ({ page }) => {
+    const islandRequests = [];
+    page.on('request', (r) => r.url().includes('islands/pulsehr-gallery.js') && islandRequests.push(r.url()));
+    await page.waitForTimeout(500);
+    expect(islandRequests).toEqual([]);
+    await expect(page.locator('.screens-grid img')).toHaveCount(8);
+    await page.locator('.screens').scrollIntoViewIfNeeded();
+    await expect(carousel(page)).toBeVisible();
+    await expect(page.locator('.screens-grid')).toHaveCount(0);
+    await expect(carousel(page).getByRole('group')).toHaveCount(8);
+    expect(islandRequests).toHaveLength(1);
+  });
+
+  test('arrows, keys and dragging change the screen, and the caption follows', async ({ page }, info) => {
+    await page.locator('.screens').scrollIntoViewIfNeeded();
+    const c = carousel(page);
+    const caption = c.locator('p').first();
+    await expect(caption).toHaveText('Attrition risk');
+    await c.getByRole('button', { name: 'Next slide' }).click();
+    await expect(caption).toHaveText('Why this score');
+    await c.getByRole('button', { name: 'Previous slide' }).click();
+    await c.getByRole('button', { name: 'Previous slide' }).click();
+    await expect(caption).toHaveText('Password recovery'); // it loops
+    if (info.project.name !== 'phone') {
+      await c.locator('[tabindex="0"]').focus();
+      await page.keyboard.press('ArrowRight');
+      await expect(caption).toHaveText('Attrition risk');
+    }
+    // drag one card to the left
+    const frame = await c.locator('[tabindex="0"]').boundingBox();
+    const y = frame.y + frame.height / 2, x = frame.x + frame.width / 2;
+    await page.mouse.move(x, y); await page.mouse.down();
+    for (let i = 1; i <= 10; i++) { await page.mouse.move(x - i * 30, y); await page.waitForTimeout(30); }
+    await page.waitForTimeout(150);
+    await page.mouse.up();
+    await expect(caption).not.toHaveText(info.project.name !== 'phone' ? 'Attrition risk' : 'Password recovery');
+  });
+
+  test('every slide image is a real, loaded screenshot', async ({ page }) => {
+    await page.locator('.screens').scrollIntoViewIfNeeded();
+    const imgs = carousel(page).locator('img');
+    await expect(imgs).toHaveCount(8);
+    await expect.poll(() => imgs.evaluateAll((els) => els.filter((i) => i.complete && i.naturalWidth === 600).length)).toBe(8);
+  });
+
+  test('the carousel follows the light theme', async ({ page }) => {
+    await page.locator('.screens').scrollIntoViewIfNeeded();
+    const next = carousel(page).getByRole('button', { name: 'Next slide' });
+    const before = await next.evaluate((el) => getComputedStyle(el).color);
+    await page.locator('#theme-btn').click();
+    await expect.poll(() => next.evaluate((el) => getComputedStyle(el).color)).not.toBe(before);
+  });
 });

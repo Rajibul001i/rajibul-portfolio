@@ -1,0 +1,36 @@
+/* Tailwind for the React parts of the page (islands/) only.
+
+   No Tailwind reset (preflight): css/style.css styles the page and must not change.
+   Utilities are generated only for classes used under src/, and they are left outside
+   cascade layers so the page's own unlayered rules (like its `* { margin: 0 }` reset)
+   can't override them.
+
+   The shadcn colour names point at the portfolio's own tokens, so the carousel follows
+   the dark/light switch with no extra code. */
+@import "tailwindcss/theme.css" layer(theme);
+@import "tailwindcss/utilities.css" source(none);
+@import "tw-animate-css";
+
+@source "../components";
+@source "../islands";
+
+@theme inline {
+  --color-background: var(--solid);
+  --color-foreground: var(--ink);
+  --color-muted: var(--surface-2);
+  --color-muted-foreground: var(--muted);
+  --color-ring: var(--accent);
+}
+
+/* The part of Tailwind's reset the carousel relies on, limited to the islands and kept
+   in a layer so any utility on the same element still wins. */
+@layer base {
+  [data-island] button {
+    border: 0;
+    background-color: transparent;
+    color: inherit;
+    font: inherit;
+    padding: 0;
+    cursor: pointer;
+  }
+}

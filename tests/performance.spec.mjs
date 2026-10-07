@@ -10,6 +10,7 @@ test('first load stays under 600 KB and does not download the 9 MB video', async
   await page.goto('/', { waitUntil: 'networkidle' });
   const urls = [...sizes.keys()];
   expect(urls.filter((u) => u.endsWith('.mp4'))).toEqual([]);
+  expect(urls.filter((u) => u.endsWith('islands/pulsehr-gallery.js')), 'React loads only near Projects').toEqual([]);
   const total = [...sizes.values()].reduce((a, b) => a + b, 0);
   console.log(`first load: ${(total / 1024).toFixed(0)} KB in ${urls.length} files`);
   expect(total).toBeLessThan(600 * 1024);
@@ -113,4 +114,20 @@ test('phones never download the Motion library (it only drives the mouse tilt)',
   await page.goto('/', { waitUntil: 'networkidle' });
   expect(urls.filter((u) => u.includes('motion'))).toEqual([]);
   await ctx.close();
+});
+
+test('the carousel costs under 400 KB: React, the component and 8 screenshots', async ({ page }) => {
+  const sizes = new Map();
+  page.on('response', async (res) => {
+    if (!/islands\/|assets\/pulsehr\//.test(res.url())) return;
+    try { sizes.set(res.url(), (await res.body()).length); } catch { /* aborted */ }
+  });
+  await page.goto('/', { waitUntil: 'networkidle' });
+  await page.locator('.screens').scrollIntoViewIfNeeded();
+  await expect(page.getByRole('region', { name: 'PulseHR screens' })).toBeVisible();
+  await page.waitForLoadState('networkidle');
+  const total = [...sizes.values()].reduce((a, b) => a + b, 0);
+  console.log(`carousel: ${(total / 1024).toFixed(0)} KB in ${sizes.size} files`);
+  expect(sizes.size).toBe(10); // JS, CSS, 8 screenshots
+  expect(total).toBeLessThan(400 * 1024);
 });
