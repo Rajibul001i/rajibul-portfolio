@@ -88,9 +88,10 @@ npx shadcn@latest add <component>
 
 ## Features
 
-- Light theme with its own sunny scene: a warm sun glow in the top corner, slow soft light
-  rays, and specks of warm light floating upward at real depths, like dust in a sunbeam,
-  flown through on scroll the same way as the stars
+- Light theme with its own sunny scene: a bright sun just below the header in the top
+  corner, a warm glow, slow soft light rays across the page, a faint lens flare that shifts
+  as the mouse moves, and specks of warm light floating upward at real depths, like dust in
+  a sunbeam (close ones out of focus), flown through on scroll the same way as the stars
 - 3D starfield (dark theme) in the site's cyan and orange: stars at real depths that you fly through as you
   scroll, a camera that leans toward the mouse, a sky that turns very slowly, faint
   constellation lines and the occasional shooting star. Pauses when the tab is hidden

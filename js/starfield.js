@@ -4,8 +4,9 @@
 // and the whole sky turns very slowly. Close stars are bigger, brighter and move more
 // than far ones, which is what makes it read as depth. Also: twinkling, faint
 // constellation lines between close stars, and the odd shooting star.
-// Light, "sunny": a warm sun glow in the top corner with slow, soft light rays, and
-// specks of warm light floating upward at the same depths, like dust in a sunbeam.
+// Light, "sunny": a bright sun in the top corner with a warm glow, slow, soft light rays
+// and a faint lens flare, and specks of warm light floating upward at the same depths,
+// like dust in a sunbeam (near ones out of focus).
 // Pauses when the tab is hidden. Reduced-motion visitors get one still frame, and anyone
 // can stop it with the pause button in the header (remembered for next time).
 (function () {
@@ -47,30 +48,59 @@
     return (sprites[color] = c);
   }
 
-  // Light theme: the sun just past the top-right corner, a warm glow, and a fan of soft
-  // rays that sway and breathe very slowly.
+  // Light theme: the sun just past the top-right corner: a bright core, a warm glow, a fan
+  // of soft rays that sway and breathe very slowly, and a faint lens flare.
+  // just below the sticky header, so its bright core is never hidden behind it
+  function sunPos() { return [W * (mobile ? 0.88 : 0.91), mobile ? 104 : 122]; }
+
   function drawSun(t) {
-    var sx = W * (mobile ? 0.92 : 0.86), sy = -H * 0.06, reach = Math.hypot(W, H) * 1.05;
-    var glow = ctx.createRadialGradient(sx, sy, 0, sx, sy, Math.max(W, H) * 0.7);
-    glow.addColorStop(0, 'rgba(255, 210, 130, 0.50)');
-    glow.addColorStop(0.22, 'rgba(255, 196, 115, 0.20)');
-    glow.addColorStop(1, 'rgba(255, 196, 115, 0)');
+    var p = sunPos(), sx = p[0], sy = p[1], reach = Math.hypot(W, H) * 1.05;
+    var breathe = 0.92 + 0.08 * Math.sin(t * 0.0006);
+
+    var glow = ctx.createRadialGradient(sx, sy, 0, sx, sy, Math.max(W, H) * 0.75);
+    glow.addColorStop(0, 'rgba(255, 214, 140, 0.62)');
+    glow.addColorStop(0.2, 'rgba(255, 198, 118, 0.26)');
+    glow.addColorStop(1, 'rgba(255, 198, 118, 0)');
     ctx.globalAlpha = 1; ctx.fillStyle = glow; ctx.fillRect(0, 0, W, H);
 
     var beam = ctx.createRadialGradient(sx, sy, 0, sx, sy, reach);
-    beam.addColorStop(0, 'rgba(255, 222, 160, 0.30)');
-    beam.addColorStop(0.55, 'rgba(255, 222, 160, 0.08)');
-    beam.addColorStop(1, 'rgba(255, 222, 160, 0)');
+    beam.addColorStop(0, 'rgba(255, 224, 165, 0.42)');
+    beam.addColorStop(0.5, 'rgba(255, 224, 165, 0.13)');
+    beam.addColorStop(1, 'rgba(255, 224, 165, 0)');
     ctx.fillStyle = beam;
-    for (var i = 0; i < 7; i++) {
+    for (var i = 0; i < 9; i++) {
       // rays fan down and to the left, across the page
-      var a = 1.75 + i * 0.2 + Math.sin(t * 0.00012 + i * 1.3) * 0.035;
-      var w = 0.035 + 0.025 * Math.sin(i * 2.1 + 1);
-      ctx.globalAlpha = 0.55 + 0.45 * Math.sin(t * 0.00025 + i * 1.7);
+      var a = 1.62 + i * 0.17 + Math.sin(t * 0.00012 + i * 1.3) * 0.04;
+      var w = 0.03 + 0.028 * (0.5 + 0.5 * Math.sin(i * 2.1 + 1));
+      ctx.globalAlpha = 0.5 + 0.5 * Math.sin(t * 0.00025 + i * 1.7);
       ctx.beginPath(); ctx.moveTo(sx, sy);
       ctx.lineTo(sx + Math.cos(a - w) * reach, sy + Math.sin(a - w) * reach);
       ctx.lineTo(sx + Math.cos(a + w) * reach, sy + Math.sin(a + w) * reach);
       ctx.closePath(); ctx.fill();
+    }
+
+    // the sun itself: a small, very bright core that blooms out
+    var core = (mobile ? 46 : 70) * breathe;
+    var disc = ctx.createRadialGradient(sx, sy, 0, sx, sy, core * 2.4);
+    disc.addColorStop(0, 'rgba(255, 252, 240, 0.98)');
+    disc.addColorStop(0.28, 'rgba(255, 238, 196, 0.85)');
+    disc.addColorStop(0.55, 'rgba(255, 214, 140, 0.35)');
+    disc.addColorStop(1, 'rgba(255, 214, 140, 0)');
+    ctx.globalAlpha = 1; ctx.fillStyle = disc;
+    ctx.beginPath(); ctx.arc(sx, sy, core * 2.4, 0, 6.283); ctx.fill();
+  }
+
+  // Lens flare: faint discs on the line from the sun through the middle of the screen. The
+  // line pivots as the camera leans toward the mouse, like turning a camera near the sun.
+  var FLARE = [[0.32, 26, '#FFD27A', 0.22], [0.55, 12, '#FFE3A8', 0.3], [0.78, 44, '#F5B66A', 0.12],
+               [1.05, 18, '#9FD8CF', 0.16], [1.32, 64, '#FFD9A0', 0.08]];
+  function drawFlare() {
+    var p = sunPos(), sx = p[0], sy = p[1];
+    var cx = W / 2 - lookX * F * 2.2, cy = H / 2 - lookY * F * 2.2;
+    for (var i = 0; i < FLARE.length; i++) {
+      var f = FLARE[i], x = sx + (cx - sx) * f[0] * 2, y = sy + (cy - sy) * f[0] * 2, d = f[1] * (mobile ? 1.3 : 2);
+      ctx.globalAlpha = f[3];
+      ctx.drawImage(sprite(f[2]), x - d / 2, y - d / 2, d, d);
     }
     ctx.globalAlpha = 1;
   }
@@ -152,7 +182,8 @@
 
       var mx = X - s.px, my = Y - s.py, len = Math.hypot(mx, my);
       if (light) { // a soft warm speck; near ones are larger and blurrier, like bokeh
-        var d = Math.min(24, 3.5 + 3.4 / s.z);
+        var d = Math.min(38, 3.5 + 4.2 / s.z);
+        if (d > 16) ctx.globalAlpha *= 0.55; // close ones are out of focus: bigger and fainter
         ctx.drawImage(sprite(ctx.fillStyle), X - d / 2, Y - d / 2, d, d);
       } else if (speed > 0.0005 && s.px !== null && len > r * 2) { // flying fast: a short, faint streak
         var cut = Math.min(1, 18 / len);
@@ -165,6 +196,8 @@
       s.px = X; s.py = Y;
       if (close > 0.62 && fadeOut === 1) near.push(X, Y);
     }
+
+    if (light) drawFlare();
 
     if (!mobile && !light) { // faint constellation lines between nearby close stars
       ctx.strokeStyle = '#00DEC8'; ctx.lineWidth = 0.6;
