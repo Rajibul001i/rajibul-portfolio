@@ -26,12 +26,12 @@ for (const w of widths) {
   });
 }
 
-test('tap targets in the header are at least 40px', async ({ page }) => {
+test('tap targets are at least 44px', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 800 });
   await page.goto('/');
-  for (const sel of ['#theme-btn', '#menu-btn', '.logo']) {
+  for (const sel of ['#sky-btn', '#theme-btn', '#menu-btn', '.logo', '.foot a']) {
     const box = await page.locator(sel).boundingBox();
-    expect(Math.min(box.width, box.height), sel).toBeGreaterThanOrEqual(40);
+    expect(Math.min(box.width, box.height), sel).toBeGreaterThanOrEqual(44);
   }
 });
 

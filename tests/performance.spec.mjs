@@ -103,3 +103,14 @@ test('the sky stops drawing when the tab is hidden', async ({ page }) => {
   }));
   expect(drawn).toBe(false);
 });
+
+test('phones never download the Motion library (it only drives the mouse tilt)', async ({ browser, baseURL }) => {
+  const ctx = await browser.newContext({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true, baseURL });
+  const page = await ctx.newPage();
+  const urls = [];
+  page.on('request', (r) => urls.push(r.url()));
+  await page.route((url) => !url.href.startsWith(baseURL), (route) => route.abort());
+  await page.goto('/', { waitUntil: 'networkidle' });
+  expect(urls.filter((u) => u.includes('motion'))).toEqual([]);
+  await ctx.close();
+});

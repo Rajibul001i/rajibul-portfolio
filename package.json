@@ -5,11 +5,15 @@
   "scripts": {
     "test": "npm run validate && npm run test:browser",
     "validate": "html-validate index.html && node --check js/main.js && node --check js/starfield.js && node --check js/tilt.js && node --check js/theme-init.js",
-    "test:browser": "playwright test"
+    "test:browser": "playwright test",
+    "vendor": "node -e \"const f=require('fs');f.writeFileSync('js/vendor/motion.js','/*! Motion '+require('motion/package.json').version+' | MIT License | https://motion.dev | copied from node_modules/motion/dist by \\x60npm run vendor\\x60 */\\n'+f.readFileSync('node_modules/motion/dist/motion.js','utf8'))\""
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.10.0",
     "@playwright/test": "1.56.1",
     "html-validate": "^9.0.0"
+  },
+  "dependencies": {
+    "motion": "^14.0.0"
   }
 }

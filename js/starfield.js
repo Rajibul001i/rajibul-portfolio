@@ -3,12 +3,16 @@
 // and the whole sky turns very slowly. Close stars are bigger, brighter and move more
 // than far ones, which is what makes it read as depth. Also: twinkling, faint
 // constellation lines between close stars, and the odd shooting star.
-// Pauses when the tab is hidden; reduced-motion visitors get one still frame.
+// Pauses when the tab is hidden. Reduced-motion visitors get one still frame, and anyone
+// can stop it with the pause button in the header (remembered for next time).
 (function () {
   var cv = document.getElementById('sky');
   if (!cv || !cv.getContext) return;
   var ctx = cv.getContext('2d');
-  var still = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var paused = false;
+  try { paused = localStorage.getItem('sky') === 'paused'; } catch (e) {}
+  var still = reduced || paused;
   var finePointer = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
   var DPR = Math.min(window.devicePixelRatio || 1, 2);
   var DARK = ['#FFFFFF', '#FFFFFF', '#D6F0EC', '#D6F0EC', '#00DEC8', '#00DEC8', '#FF9A5C'];
@@ -145,12 +149,15 @@
     if (!still) raf = requestAnimationFrame(draw);
   }
 
+  function start() { last = 0; lastScroll = window.scrollY; push = 0; if (!raf) raf = requestAnimationFrame(draw); }
+  function stop() { cancelAnimationFrame(raf); raf = null; }
+
   build();
-  if (still) { draw(0); } else { raf = requestAnimationFrame(draw); }
+  if (still) draw(0); else start();
   var rt;
   window.addEventListener('resize', function () { clearTimeout(rt); rt = setTimeout(function () { build(); if (still) draw(0); }, 200); });
-  if (still) window.addEventListener('themechange', function () { draw(0); });
-  if (!still && finePointer) {
+  window.addEventListener('themechange', function () { if (still) draw(0); });
+  if (finePointer) {
     window.addEventListener('pointermove', function (e) {
       aimX = (e.clientX / W - 0.5) * 0.12;
       aimY = (e.clientY / H - 0.5) * 0.08;
@@ -158,7 +165,22 @@
   }
   document.addEventListener('visibilitychange', function () {
     if (still) return;
-    if (document.hidden) { cancelAnimationFrame(raf); raf = null; }
-    else if (!raf) { last = 0; lastScroll = window.scrollY; push = 0; raf = requestAnimationFrame(draw); }
+    if (document.hidden) stop(); else start();
   });
+
+  // Pause button. Hidden for reduced-motion visitors, whose sky never moves.
+  var btn = document.getElementById('sky-btn');
+  if (btn) {
+    if (reduced) { btn.hidden = true; return; }
+    var show = function () {
+      btn.setAttribute('aria-pressed', String(paused));
+      btn.setAttribute('aria-label', paused ? 'Play background animation' : 'Pause background animation');
+    };
+    show();
+    btn.addEventListener('click', function () {
+      paused = !paused; still = paused; show();
+      try { localStorage.setItem('sky', paused ? 'paused' : 'playing'); } catch (e) {}
+      if (paused) { stop(); draw(0); } else start();
+    });
+  }
 })();

@@ -15,7 +15,8 @@ Each language does one job:
 | `js/theme-init.js` | JavaScript | Applies the saved light/dark choice before the page paints (loaded in `<head>`) |
 | `js/main.js` | JavaScript | Theme toggle, phone menu, reveal on scroll, highlighting the section in view |
 | `js/starfield.js` | JavaScript | The 3D star background (canvas) |
-| `js/tilt.js` | JavaScript | 3D tilt of the portrait and the cards with the mouse |
+| `js/tilt.js` | JavaScript | 3D tilt of the portrait and the cards with the mouse, on springs |
+| `js/vendor/motion.js` | JavaScript | [Motion](https://motion.dev) (MIT), loaded only on devices with a mouse. Refresh with `npm run vendor` after updating the package |
 
 ```
 assets/rabbi-cutout.webp   Portrait with the background removed (PNG fallback alongside)
@@ -38,8 +39,10 @@ No build step. Edit the files and push to `main`; GitHub Pages publishes them.
   and tilts with the mouse (floats gently on touch screens)
 - 3D motion: on load the name rises line by line, the portrait swings round and the award
   badge flies in; sections stand up from a slight backward lean as they scroll into view; cards
-  lean toward the mouse with a light that follows it. Content is never hidden while it moves,
-  and visitors who turn on reduced motion get a still page
+  lean toward the mouse on springs, with a light that follows it. Content is never hidden while
+  it moves, and visitors who turn on reduced motion get a still page
+- Pause button for the moving background, remembered between visits
+- Reading-progress line along the header
 - Dark theme by default, with a light theme toggle that remembers the choice
 - Works on phones, with a menu button below 760 px
 - Keyboard focus styles, a skip link, and reduced motion for visitors who ask for it
@@ -53,9 +56,10 @@ npx playwright install chromium
 npm test
 ```
 
-HTML validation, then 76 checks in a real browser on desktop and phone: structure,
+HTML validation, then 84 checks in a real browser on desktop and phone: structure,
 visitor journey, layout at 11 screen widths, accessibility (axe-core, WCAG 2.1 AA, both themes),
 and performance budgets. They run on every push through GitHub Actions. What is
-checked, the results and the bugs they found are in [docs/TESTING.md](docs/TESTING.md).
+checked, the results and the bugs they found are in [docs/TESTING.md](docs/TESTING.md). The
+UI/UX review against UI UX Pro Max is in [docs/DESIGN-REVIEW.md](docs/DESIGN-REVIEW.md).
 
 The tests need Node.js, but the site itself still has no build step.

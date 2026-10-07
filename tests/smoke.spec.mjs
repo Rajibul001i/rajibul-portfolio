@@ -146,3 +146,39 @@ test('the hero plays its 3D entrance once and ends fully in place', async ({ pag
     expect(st.it, sel).toBe('1');
   }
 });
+
+test('the first screen has one primary button, and it leads to contact', async ({ page }) => {
+  const primaries = await page.locator('.btn-primary').evaluateAll((els) => els
+    .filter((el) => { const r = el.getBoundingClientRect(); return r.width && r.top < innerHeight && r.bottom > 0; })
+    .map((el) => el.getAttribute('href')));
+  expect(primaries).toEqual(['#contact']);
+});
+
+test('the background animation can be paused, and stays paused after reload', async ({ page }) => {
+  const btn = page.locator('#sky-btn');
+  const frame = () => page.locator('#sky').evaluate((c) => c.toDataURL());
+  await expect(btn).toHaveAttribute('aria-pressed', 'false');
+  await btn.click();
+  await expect(btn).toHaveAttribute('aria-pressed', 'true');
+  await expect(btn).toHaveAccessibleName('Play background animation');
+  const a = await frame(); await page.waitForTimeout(600);
+  expect(await frame()).toBe(a);
+  await page.reload();
+  await expect(btn).toHaveAttribute('aria-pressed', 'true');
+  const b = await frame(); await page.waitForTimeout(600);
+  expect(await frame()).toBe(b);
+  await btn.click();
+  await expect(btn).toHaveAttribute('aria-pressed', 'false');
+  await page.waitForTimeout(300);
+  expect(await frame()).not.toBe(b);
+});
+
+test('card tilt runs on springs from the Motion library', async ({ page }, info) => {
+  test.skip(info.project.name === 'phone', 'no mouse on a phone');
+  await expect.poll(() => page.evaluate(() => typeof window.Motion?.springValue)).toBe('function');
+  const card = page.locator('#skills .card').first();
+  await card.scrollIntoViewIfNeeded();
+  const box = await card.boundingBox();
+  await page.mouse.move(box.x + box.width * 0.8, box.y + box.height * 0.2, { steps: 4 });
+  await expect(card).toHaveClass(/sprung/);
+});

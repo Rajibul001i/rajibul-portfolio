@@ -6,7 +6,8 @@ import { readFileSync, existsSync, readdirSync } from 'node:fs';
 const root = new URL('..', import.meta.url).pathname;
 const html = readFileSync(root + 'index.html', 'utf8');
 const css = readFileSync(root + 'css/style.css', 'utf8');
-const jsFiles = readdirSync(root + 'js').map((f) => 'js/' + f);
+// our own scripts; js/vendor/ holds third-party code that is loaded on demand
+const jsFiles = readdirSync(root + 'js').filter((f) => f.endsWith('.js')).map((f) => 'js/' + f);
 const allSource = [html, css, ...jsFiles.map((f) => readFileSync(root + f, 'utf8'))].join('\n');
 
 test.describe('HTML is only for structure', () => {
@@ -83,6 +84,12 @@ test.describe('content and safety', () => {
   });
   test('icons are drawn as SVG, not emoji (emoji look different on every phone)', () => {
     expect(html.match(/[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}]/gu) ?? []).toEqual([]);
+  });
+  test('the bundled Motion library matches the installed package', () => {
+    const pkg = JSON.parse(readFileSync(root + 'node_modules/motion/package.json', 'utf8'));
+    const vendored = readFileSync(root + 'js/vendor/motion.js', 'utf8');
+    expect(vendored.split('\n')[0]).toContain(`Motion ${pkg.version} | MIT License`);
+    expect(vendored.slice(vendored.indexOf('\n') + 1)).toBe(readFileSync(root + 'node_modules/motion/dist/motion.js', 'utf8'));
   });
   test('the photo is a separate file, not embedded in the HTML', () => {
     expect(html).not.toMatch(/data:image\//);
