@@ -81,5 +81,14 @@ test('with reduced motion the sky is still and nothing animates', async ({ brows
     .filter((el) => { const s = getComputedStyle(el); return s.animationName !== 'none' && s.animationPlayState === 'running' && parseFloat(s.animationDuration) > 0.01 && s.animationIterationCount === 'infinite'; })
     .map((el) => el.className));
   expect(moving).toEqual([]);
+  // no entrance animation, no lean on scroll-in, no tilt under the mouse
+  expect(await page.locator('.hero h1 .line').first().evaluate((el) => getComputedStyle(el).animationName)).toBe('none');
+  const card = page.locator('#skills .card').first();
+  await card.scrollIntoViewIfNeeded();
+  expect(await card.evaluate((el) => getComputedStyle(el).getPropertyValue('--rv-x'))).toBe('0deg');
+  const box = await card.boundingBox();
+  await page.mouse.move(box.x + box.width * 0.9, box.y + 5);
+  await page.waitForTimeout(200);
+  await expect(card).not.toHaveClass(/tilting/);
   await ctx.close();
 });

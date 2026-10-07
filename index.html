@@ -23,7 +23,7 @@
 <script src="js/theme-init.js"></script>
 <script src="js/main.js" defer></script>
 <script src="js/starfield.js" defer></script>
-<script src="js/portrait-tilt.js" defer></script>
+<script src="js/tilt.js" defer></script>
 </head>
 <body>
 <a class="skip" href="#main">Skip to content</a>
@@ -64,7 +64,7 @@
       <div class="hero-grid">
         <div>
           <span class="status"><span class="dot" aria-hidden="true"></span>BSc CSE · Jr. Executive at Daraz · Aspiring developer</span>
-          <h1>Md. Rajibul<br><em>Islam Rabbi</em></h1>
+          <h1><span class="line">Md. Rajibul</span><br><em class="line">Islam Rabbi</em></h1>
           <p class="lead">Computer Science student and operations professional, building real-world experience today and a software career tomorrow.</p>
           <div class="hero-ctas">
             <a class="btn btn-primary" href="#experience">See my journey</a>
@@ -75,7 +75,7 @@
             </a>
           </div>
         </div>
-        <div class="portrait reveal" id="portrait">
+        <div class="portrait" id="portrait">
           <div class="p3d" id="p3d">
             <div class="p3d-card" aria-hidden="true"></div>
             <div class="p3d-person">
@@ -85,7 +85,7 @@
               </picture>
             </div>
             <div class="award">
-              <div class="ico" aria-hidden="true">🏆</div>
+              <div class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0V4zM7 6H4a3 3 0 0 0 3 4M17 6h3a3 3 0 0 1-3 4"/></svg></div>
               <div><strong>Employee of the Year</strong><span>2025 · Daraz</span></div>
             </div>
           </div>
@@ -132,7 +132,7 @@
         <p>3+ years at Daraz, Bangladesh's leading e-commerce platform.</p>
       </div>
       <div class="timeline">
-        <article class="job reveal">
+        <article class="job reveal" data-tilt>
           <div class="when"><b>May 2024 – Present</b>Full-time<br><span class="now">CURRENT</span></div>
           <div>
             <h3>Jr. Executive</h3>
@@ -143,10 +143,10 @@
               <li>Resolve seller cases and foster a collaborative team environment</li>
               <li>Manage company assets and handle IT support and troubleshooting</li>
             </ul>
-            <span class="badge-award">🏆 Employee of the Year 2025, Daraz</span>
+            <span class="badge-award"><span aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0V4zM7 6H4a3 3 0 0 0 3 4M17 6h3a3 3 0 0 1-3 4"/></svg></span>Employee of the Year 2025, Daraz</span>
           </div>
         </article>
-        <article class="job reveal">
+        <article class="job reveal" data-tilt>
           <div class="when"><b>Mar 2023 – Apr 2024</b>Full-time</div>
           <div>
             <h3>Operator</h3>
@@ -216,8 +216,8 @@
         <p>Strengths from daily professional work, and a developer toolkit I'm actively building.</p>
       </div>
       <div class="skills-grid">
-        <div class="card reveal">
-          <div class="card-head"><div class="card-ico warm" aria-hidden="true">💻</div><div><h3>CS &amp; development</h3><p class="sub">Developing through my CSE degree</p></div></div>
+        <div class="card reveal" data-tilt>
+          <div class="card-head"><div class="card-ico warm" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m8 8-4 4 4 4M16 8l4 4-4 4M14 5l-4 14"/></svg></div><div><h3>CS &amp; development</h3><p class="sub">Developing through my CSE degree</p></div></div>
           <div class="tags">
             <span class="tag learning">HTML / CSS</span><span class="tag learning">JavaScript</span>
             <span class="tag learning">Python</span><span class="tag learning">C / C++</span>
@@ -226,16 +226,16 @@
             <span class="tag learning">Data structures</span><span class="tag learning">Algorithms</span>
           </div>
         </div>
-        <div class="card reveal">
-          <div class="card-head"><div class="card-ico" aria-hidden="true">📊</div><div><h3>Office &amp; productivity</h3><p class="sub">Used daily at Daraz</p></div></div>
+        <div class="card reveal" data-tilt>
+          <div class="card-head"><div class="card-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M8 16v-4M12 16V8M16 16v-6"/></svg></div><div><h3>Office &amp; productivity</h3><p class="sub">Used daily at Daraz</p></div></div>
           <div class="tags"><span class="tag">Word</span><span class="tag">Excel</span><span class="tag">PowerPoint</span><span class="tag">Google Docs</span><span class="tag">Google Sheets</span></div>
         </div>
-        <div class="card reveal">
-          <div class="card-head"><div class="card-ico" aria-hidden="true">🤖</div><div><h3>AI tools</h3><p class="sub">Comfortable using AI to work faster</p></div></div>
+        <div class="card reveal" data-tilt>
+          <div class="card-head"><div class="card-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.8 4.7 4.7 1.8-4.7 1.8L12 16l-1.8-4.7-4.7-1.8 4.7-1.8zM19 15l.8 2.2 2.2.8-2.2.8L19 21l-.8-2.2-2.2-.8 2.2-.8z"/></svg></div><div><h3>AI tools</h3><p class="sub">Comfortable using AI to work faster</p></div></div>
           <div class="tags"><span class="tag">ChatGPT</span><span class="tag">Claude AI</span><span class="tag">AI workflows</span></div>
         </div>
-        <div class="card reveal">
-          <div class="card-head"><div class="card-ico" aria-hidden="true">🌐</div><div><h3>Languages &amp; certificates</h3><p class="sub">Clear communicator in professional settings</p></div></div>
+        <div class="card reveal" data-tilt>
+          <div class="card-head"><div class="card-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/></svg></div><div><h3>Languages &amp; certificates</h3><p class="sub">Clear communicator in professional settings</p></div></div>
           <div class="tags"><span class="tag">English</span><span class="tag">Bangla</span><span class="tag">British Council Business English</span></div>
         </div>
       </div>
@@ -252,19 +252,19 @@
         <p>Building the foundations for a full-time development career.</p>
       </div>
       <div class="edu-grid">
-        <div class="card edu reveal">
-          <div class="card-head"><div class="card-ico" aria-hidden="true">🎓</div><div><h3>BSc in Computer Science &amp; Engineering</h3><p class="school">Southeast University, Dhaka</p></div></div>
+        <div class="card edu reveal" data-tilt>
+          <div class="card-head"><div class="card-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m2 9 10-5 10 5-10 5z"/><path d="M6 11v5c0 1.7 2.7 3 6 3s6-1.3 6-3v-5M22 9v6"/></svg></div><div><h3>BSc in Computer Science &amp; Engineering</h3><p class="school">Southeast University, Dhaka</p></div></div>
           <div class="meta"><span class="pill accent">Enrolled · 8th semester</span><span class="pill">Oct 2023 – Present</span><span class="pill">Weekend batch</span><span class="pill">CGPA 3.11</span></div>
           <p class="note">Graduating soon, and ready to step into full-time software development.</p>
         </div>
-        <div class="card edu reveal">
-          <div class="card-head"><div class="card-ico warm" aria-hidden="true">📚</div><div><h3>Higher Secondary Certificate</h3><p class="school">Shaheed Monsur Ali College, Pabna</p></div></div>
+        <div class="card edu reveal" data-tilt>
+          <div class="card-head"><div class="card-ico warm" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 5h6a4 4 0 0 1 4 4v11a3 3 0 0 0-3-3H2zM22 5h-6a4 4 0 0 0-4 4v11a3 3 0 0 1 3-3h7z"/></svg></div><div><h3>Higher Secondary Certificate</h3><p class="school">Shaheed Monsur Ali College, Pabna</p></div></div>
           <div class="meta"><span class="pill">2020 – 2021</span><span class="pill">GPA 3.19</span><span class="pill">Science</span></div>
           <p class="note">Where the STEM journey first began.</p>
         </div>
       </div>
-      <div class="next reveal">
-        <div class="big" aria-hidden="true">🚀</div>
+      <div class="next reveal" data-tilt>
+        <div class="big" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="m7 9 3 3-3 3M13 15h4"/></svg></div>
         <div>
           <h3>The next chapter: full-time developer</h3>
           <p>After graduation I'm moving into software development full-time. My background in operations and IT at a major tech company, together with my CSE degree, gives me an edge: I understand both the business side and the code that powers it.</p>
@@ -281,22 +281,22 @@
           <p class="eyebrow">Let's connect</p>
           <h2>I'd love to hear from you</h2>
           <p class="intro">Whether it's a job opportunity, a project, or just a friendly hello, reach out any time. WhatsApp is the fastest way to reach me.</p>
-          <p class="loc">📍 Shanti Nikatan, Dhaka-1208, Bangladesh</p>
+          <p class="loc"><span aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-6.2-7-11a7 7 0 0 1 14 0c0 4.8-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg></span>Shanti Nikatan, Dhaka-1208, Bangladesh</p>
         </div>
         <div class="contact-list">
-          <a class="contact-item" href="https://wa.me/8801308823620" target="_blank" rel="noopener">
+          <a class="contact-item" data-tilt href="https://wa.me/8801308823620" target="_blank" rel="noopener">
             <div class="card-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1l-.8 1c-.1.2-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.2-.4.2-.4.7-1.3.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.7 11.8 11.8 0 0 0 4.5 4c1.7.7 2.4.8 3.2.6a2.8 2.8 0 0 0 1.8-1.3 2.3 2.3 0 0 0 .2-1.3c-.1-.1-.3-.2-.6-.3z"/></svg></div>
             <div><strong>WhatsApp</strong><span>+880&nbsp;1308&#8209;823620</span></div>
           </a>
-          <a class="contact-item" href="mailto:ri5119316@gmail.com">
+          <a class="contact-item" data-tilt href="mailto:ri5119316@gmail.com">
             <div class="card-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg></div>
             <div><strong>Email</strong><span>ri5119316@gmail.com</span></div>
           </a>
-          <a class="contact-item" href="tel:+8801554550816">
+          <a class="contact-item" data-tilt href="tel:+8801554550816">
             <div class="card-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.7a2 2 0 0 1-.5 2.1L8 9.8a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.7.7a2 2 0 0 1 1.7 2z"/></svg></div>
             <div><strong>Phone</strong><span>+880&nbsp;1554&#8209;550816</span></div>
           </a>
-          <a class="contact-item" href="https://www.linkedin.com/in/rajibul-islam-rabbi" target="_blank" rel="noopener">
+          <a class="contact-item" data-tilt href="https://www.linkedin.com/in/rajibul-islam-rabbi" target="_blank" rel="noopener">
             <div class="card-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.45 20.45h-3.56v-5.57c0-1.33-.02-3.04-1.85-3.04-1.85 0-2.14 1.45-2.14 2.94v5.67H9.35V9h3.41v1.56h.05c.48-.9 1.64-1.85 3.37-1.85 3.6 0 4.27 2.37 4.27 5.46v6.28zM5.34 7.43a2.06 2.06 0 1 1 0-4.13 2.06 2.06 0 0 1 0 4.13zM7.12 20.45H3.56V9h3.56v11.45z"/></svg></div>
             <div><strong>LinkedIn</strong><span>rajibul-islam-rabbi</span></div>
           </a>
@@ -307,10 +307,10 @@
 </main>
 
 <footer>
-  <div class="wrap foot">
+  <div class="wrap"><div class="foot">
     <span>© <span id="year">2026</span> Md. Rajibul Islam Rabbi · Dhaka, Bangladesh</span>
     <a href="#top">Back to top ↑</a>
-  </div>
+  </div></div>
 </footer>
 
 </body>

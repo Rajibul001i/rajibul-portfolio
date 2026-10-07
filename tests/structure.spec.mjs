@@ -81,6 +81,9 @@ test.describe('content and safety', () => {
     const js = jsFiles.map((f) => readFileSync(root + f, 'utf8')).join('\n');
     expect(js).not.toMatch(/innerHTML|outerHTML|insertAdjacentHTML|document\.write|eval\(|new Function/);
   });
+  test('icons are drawn as SVG, not emoji (emoji look different on every phone)', () => {
+    expect(html.match(/[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}]/gu) ?? []).toEqual([]);
+  });
   test('the photo is a separate file, not embedded in the HTML', () => {
     expect(html).not.toMatch(/data:image\//);
     expect(Buffer.byteLength(html)).toBeLessThan(60_000);

@@ -121,3 +121,28 @@ test('page still shows everything with JavaScript turned off', async ({ browser,
   await expect(p.locator('#contact')).toBeVisible();
   await ctx.close();
 });
+
+test('cards lean toward the mouse in 3D and settle back when it leaves', async ({ page }, info) => {
+  test.skip(info.project.name === 'phone', 'no mouse on a phone');
+  const card = page.locator('#skills .card').first();
+  await card.scrollIntoViewIfNeeded();
+  await expect(card).toHaveClass(/\bin\b/);
+  const box = await card.boundingBox();
+  await page.mouse.move(box.x + box.width * 0.9, box.y + box.height * 0.1, { steps: 5 });
+  await expect(card).toHaveClass(/tilting/);
+  await expect.poll(() => card.evaluate((el) => parseFloat(getComputedStyle(el).getPropertyValue('--tilt-y')))).toBeGreaterThan(2);
+  await page.mouse.move(5, 5);
+  await expect(card).not.toHaveClass(/tilting/);
+  await expect.poll(() => card.evaluate((el) => parseFloat(getComputedStyle(el).getPropertyValue('--tilt-y')))).toBeLessThan(0.1);
+});
+
+test('the hero plays its 3D entrance once and ends fully in place', async ({ page }) => {
+  const line = page.locator('.hero h1 .line').first();
+  expect(await line.evaluate((el) => getComputedStyle(el).animationName)).toBe('rise3d');
+  await page.waitForTimeout(2600);
+  for (const sel of ['.hero h1 .line', '.hero .lead', '.portrait', '.award']) {
+    const st = await page.locator(sel).first().evaluate((el) => ({ o: getComputedStyle(el).opacity, it: getComputedStyle(el).animationIterationCount }));
+    expect(st.o, sel).toBe('1');
+    expect(st.it, sel).toBe('1');
+  }
+});

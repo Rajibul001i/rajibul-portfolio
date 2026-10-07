@@ -21,23 +21,24 @@ npm test
 ```
 
 `npm test` validates the HTML and JavaScript, starts a small local server
-(`tests/server.mjs`), and runs 71 browser checks: 53 on a desktop screen (1366×800) and 18
+(`tests/server.mjs`), and runs 76 browser checks: 56 on a desktop screen (1366×800) and 20
 on a phone (Pixel 7). Every browser test runs offline, and a test fails if the page logs a
 JavaScript error, breaks the Content-Security-Policy, or requests a file that doesn't exist.
 
 ## What is checked
 
-**Structure (15, run once)**
+**Structure (16, run once)**
 - HTML holds structure only: no `<style>`, no `style=""`, no inline scripts or `onclick=`
 - Every local file the page refers to exists; every `#link` has a target; ids are unique
 - The link-preview image is a real file in the repo
 - Every image has alt text; every new-tab link has `rel="noopener"`
 - A strict Content-Security-Policy is present (no `unsafe-inline` or `unsafe-eval`)
 - Scripts never build HTML from strings (no `innerHTML`, `eval`)
+- Icons are SVG, not emoji (emoji look different on every phone)
 - Regression: the old admin PIN, passwords, API keys and the fake visitor counter stay removed
 - Page basics: language, title, description, viewport, favicon; the photo is not embedded in the HTML
 
-**Visitor journey (11 per device)**
+**Visitor journey (13 per device)**
 - Name, photo and every section load; the footer shows the current year
 - Menu links scroll to their section and highlight it; the phone menu opens, closes with
   Escape and closes after a link is picked
@@ -47,6 +48,8 @@ JavaScript error, breaks the Content-Security-Policy, or requests a file that do
   front of the file so it can start before it has fully downloaded
 - Project and contact links point to the right places
 - All content becomes visible after scrolling, and is visible with JavaScript turned off
+- Cards lean toward the mouse in 3D and settle back when it leaves
+- The hero's 3D entrance plays once and ends with everything fully in place
 
 **Layout (13)**
 - No sideways scrolling and nothing poking out of the screen at 11 widths from 320 to
@@ -57,7 +60,8 @@ JavaScript error, breaks the Content-Security-Policy, or requests a file that do
 - axe-core finds nothing in the dark theme, the light theme, or with the phone menu open
 - The skip link is the first Tab stop; every Tab stop shows a focus ring
 - Headings go in order (one `h1`, no skipped levels)
-- With reduced motion turned on, the sky is still and nothing animates
+- With reduced motion turned on, the sky is still, nothing animates, there is no hero entrance,
+  sections don't lean in, and cards don't tilt
 
 **Performance (7)**
 - First load stays under 600 KB and never downloads the 9 MB video
@@ -69,20 +73,21 @@ JavaScript error, breaks the Content-Security-Policy, or requests a file that do
 
 ## Results
 
-Run on 7 October 2026, Chromium 141 (Playwright 1.56.1), three runs in a row:
+Run on 7 October 2026, Chromium 141 (Playwright 1.56.1), after adding the 3D starfield, card tilt and
+hero entrance:
 
-**64 passed, 7 skipped, 0 failed.** The skips are by design: phone-only checks skipped on desktop,
-keyboard checks skipped on the phone, and video playback, which needs the H.264 codec that
+**68 passed, 8 skipped, 0 failed.** The skips are by design: phone-only checks skipped on desktop,
+keyboard and mouse checks skipped on the phone, and video playback, which needs the H.264 codec that
 Playwright's open-source Chromium leaves out. Chrome, Edge, Safari and Firefox all have it.
 
 | Measurement | Result | Budget |
 |---|---|---|
-| First load | 273 KB in 10 files | 600 KB |
-| DOM ready | 121–167 ms | 1.5 s |
+| First load | 283 KB in 10 files | 600 KB |
+| DOM ready | 118–167 ms | 1.5 s |
 | Largest paint | 160–228 ms | 2.5 s |
 | Layout shift | 0.000 | 0.1 |
-| Starfield drawing, normal CPU | avg 0.6 ms, p95 1.2 ms a frame | 4 ms avg |
-| Starfield drawing, 4x slower CPU + scrolling | avg 1.2 ms, p95 3.7 ms a frame | 10 ms avg, 16 ms p95 |
+| 3D starfield drawing (720 stars), normal CPU | avg 0.5 ms, p95 0.8 ms a frame | 4 ms avg |
+| 3D starfield, 4x slower CPU + scrolling | avg 1.1 ms, p95 3.7 ms a frame | 10 ms avg, 16 ms p95 |
 
 ## Bugs the tests found, and the fixes
 
@@ -95,5 +100,6 @@ Playwright's open-source Chromium leaves out. Chrome, Edge, Safari and Firefox a
 | P-5 | Keyboard test | No focus ring while tabbing through the video's controls | Focus ring on the video while its controls have focus |
 | P-6 | Tap-target test | The "Rabbi." logo link was 36 px tall | 44 px tap height |
 | P-7 | Security review | No Content-Security-Policy | Strict CSP added (scripts and media from the site only; fonts from Google Fonts only), plus a referrer policy |
+| P-8 | Layout test | The new 3D scroll reveal swung the bottom of the tall project card toward the viewer, making the page 1–6 px wider than a phone screen | Large blocks hinge on their bottom edge, so no part comes forward |
 
 The colour changes are small shifts of the same teal and grey, so the theme looks the same.

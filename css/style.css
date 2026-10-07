@@ -17,6 +17,7 @@
   --warm-soft: rgba(255, 154, 92, .11);
   --shadow: 0 1px 2px rgba(0, 0, 0, .35), 0 12px 34px rgba(0, 0, 0, .35);
   --glow: 0 0 28px rgba(0, 222, 200, .14);
+  --glare: rgba(0, 222, 200, .11);
   --radius: 18px;
   --max: 1080px;
   color-scheme: dark;
@@ -38,6 +39,7 @@
   --warm-soft: rgba(255, 154, 92, .16);
   --shadow: 0 1px 2px rgba(13, 27, 39, .05), 0 8px 28px rgba(13, 27, 39, .07);
   --glow: 0 0 0 transparent;
+  --glare: rgba(0, 122, 110, .08);
   color-scheme: light;
 }
 
@@ -71,13 +73,14 @@ body {
 header.nav, main, footer { position: relative; z-index: 1; }
 img { max-width: 100%; display: block; }
 a { color: inherit; }
-h1, h2, h3 { font-family: 'Fraunces', Georgia, serif; font-weight: 650; letter-spacing: -.01em; line-height: 1.15; }
+h1, h2, h3 { font-family: 'Fraunces', Georgia, serif; font-weight: 650; letter-spacing: -.01em; line-height: 1.15; text-wrap: balance; }
+p, li { text-wrap: pretty; }
 :focus-visible { outline: 2.5px solid var(--accent); outline-offset: 3px; border-radius: 6px; }
 video:focus, video:focus-within { outline: 2.5px solid var(--accent); outline-offset: 3px; }
 .skip { position: absolute; left: -999px; top: 8px; background: var(--accent); color: var(--accent-ink); padding: 8px 14px; border-radius: 8px; z-index: 999; font-weight: 600; text-decoration: none; }
 .skip:focus { left: 12px; }
 .wrap { max-width: var(--max); margin: 0 auto; padding: 0 24px; }
-section { padding: 88px 0; }
+section { padding: 76px 0; }
 
 /* ---------- nav ---------- */
 header.nav {
@@ -197,13 +200,15 @@ header.nav {
   .p3d { animation: none; }
 }
 .award {
+  --award-pos: translateZ(60px);
   position: absolute; left: -30px; bottom: 7%;
-  transform: translateZ(60px);
+  transform: var(--award-pos);
   display: flex; align-items: center; gap: 12px;
   background: var(--solid); border: 1px solid var(--line); border-radius: 16px;
   padding: 12px 16px; box-shadow: var(--shadow);
 }
-.award .ico { width: 40px; height: 40px; border-radius: 12px; background: var(--warm-soft); display: grid; place-items: center; font-size: 1.25rem; }
+.award .ico { width: 40px; height: 40px; border-radius: 12px; background: var(--warm-soft); color: var(--warm); display: grid; place-items: center; }
+.award .ico svg { width: 22px; height: 22px; }
 .award strong { display: block; font-size: .95rem; }
 .award span { font-size: .8rem; color: var(--muted); }
 
@@ -252,6 +257,7 @@ header.nav {
 .job li { position: relative; padding-left: 20px; color: var(--muted); }
 .job li::before { content: ''; position: absolute; left: 2px; top: .7em; width: 7px; height: 7px; border-radius: 2px; background: var(--accent); opacity: .7; }
 .badge-award { display: inline-flex; align-items: center; gap: 8px; margin-top: 18px; padding: 7px 13px; border-radius: 999px; background: var(--warm-soft); font-size: .88rem; font-weight: 600; }
+.badge-award svg { width: 16px; height: 16px; display: block; color: var(--warm); }
 
 /* ---------- projects ---------- */
 .project {
@@ -288,8 +294,9 @@ header.nav {
   padding: 26px; box-shadow: var(--shadow);
 }
 .card-head { display: flex; align-items: center; gap: 14px; }
-.card-ico { width: 44px; height: 44px; border-radius: 12px; background: var(--accent-soft); display: grid; place-items: center; font-size: 1.3rem; flex-shrink: 0; }
-.card-ico.warm { background: var(--warm-soft); }
+.card-ico { width: 44px; height: 44px; border-radius: 12px; background: var(--accent-soft); color: var(--accent); display: grid; place-items: center; flex-shrink: 0; }
+.card-ico svg { width: 22px; height: 22px; }
+.card-ico.warm { background: var(--warm-soft); color: var(--warm); }
 .card h3 { font-size: 1.15rem; }
 .card .sub { color: var(--muted); font-size: .92rem; }
 .card .tags { margin-top: 18px; }
@@ -310,7 +317,8 @@ header.nav {
   background: linear-gradient(135deg, var(--accent-soft), var(--warm-soft));
   border: 1px solid var(--line); border-radius: var(--radius); padding: 28px;
 }
-.next .big { font-size: 2rem; }
+.next .big { width: 56px; height: 56px; border-radius: 16px; background: var(--solid); border: 1px solid var(--line); color: var(--accent); display: grid; place-items: center; }
+.next .big svg { width: 28px; height: 28px; }
 .next h3 { font-size: 1.3rem; }
 .next p { color: var(--muted); margin-top: 6px; }
 
@@ -323,13 +331,14 @@ header.nav {
 .contact-box h2 { font-size: clamp(1.9rem, 3.6vw, 2.5rem); margin-top: 10px; }
 .contact-box .intro { color: var(--muted); margin-top: 12px; }
 .loc { display: flex; align-items: center; gap: 8px; margin-top: 20px; color: var(--muted); font-size: .95rem; }
+.loc svg { width: 18px; height: 18px; display: block; color: var(--accent); }
 .contact-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 12px; }
 .contact-item {
   display: flex; align-items: center; gap: 14px; padding: 16px;
   border: 1px solid var(--line); border-radius: 16px; text-decoration: none;
-  background: var(--bg); transition: border-color .2s, transform .2s; min-width: 0;
+  background: var(--bg); min-width: 0;
 }
-.contact-item:hover { border-color: var(--accent); transform: translateY(-2px); }
+.contact-item:hover { border-color: var(--accent); --lift: -3px; }
 .contact-item .card-ico { width: 40px; height: 40px; }
 .contact-item svg { width: 20px; height: 20px; color: var(--accent); }
 .contact-item strong { display: block; font-size: .95rem; }
@@ -340,13 +349,67 @@ footer { padding: 40px 0 56px; color: var(--faint); font-size: .9rem; }
 .foot a { color: var(--muted); text-decoration: none; }
 .foot a:hover { color: var(--accent); }
 
-/* ---------- reveal ---------- */
-.js .reveal { opacity: 0; transform: translateY(18px); transition: opacity .6s ease, transform .6s ease; }
-.js .reveal.in { opacity: 1; transform: none; }
+/* ---------- 3D motion ---------- */
+/* Registered so they can be animated: the scroll reveal, the pointer tilt and the hover
+   lift all feed one transform, so they combine instead of overriding each other. */
+@property --rv-x { syntax: '<angle>'; inherits: false; initial-value: 0deg; }
+@property --rv-y { syntax: '<length>'; inherits: false; initial-value: 0px; }
+@property --rv-z { syntax: '<length>'; inherits: false; initial-value: 0px; }
+@property --tilt-x { syntax: '<angle>'; inherits: false; initial-value: 0deg; }
+@property --tilt-y { syntax: '<angle>'; inherits: false; initial-value: 0deg; }
+@property --lift { syntax: '<length>'; inherits: false; initial-value: 0px; }
+
+.reveal, [data-tilt] {
+  --tilt-time: .6s;
+  transform: perspective(1200px) translate3d(0, calc(var(--rv-y) + var(--lift)), var(--rv-z)) rotateX(calc(var(--rv-x) + var(--tilt-x))) rotateY(var(--tilt-y));
+  transition:
+    --rv-x 1s cubic-bezier(.2, .7, .2, 1) var(--rv-delay, 0s), --rv-y 1s cubic-bezier(.2, .7, .2, 1) var(--rv-delay, 0s),
+    --rv-z 1s cubic-bezier(.2, .7, .2, 1) var(--rv-delay, 0s),
+    --tilt-x var(--tilt-time) cubic-bezier(.2, .7, .2, 1), --tilt-y var(--tilt-time) cubic-bezier(.2, .7, .2, 1),
+    --lift .25s ease, border-color .2s;
+}
+/* Scroll reveal: blocks wait slightly sunk and leaning back, then stand up as they come
+   into view. They are never hidden, so the page reads fine before anything moves. */
+.js .reveal { --rv-x: 14deg; --rv-y: 36px; --rv-z: -80px; }
+.js .reveal.in { --rv-x: 0deg; --rv-y: 0px; --rv-z: 0px; }
+/* Large blocks hinge on their bottom edge, so leaning back never swings any part of them
+   toward the viewer (which would make them wider than a phone screen). */
+.reveal:not([data-tilt]) { transform-origin: 50% 100%; }
+.timeline > :nth-child(2), .skills-grid > :nth-child(2n), .edu-grid > :nth-child(2) { --rv-delay: .12s; }
+
+/* Pointer tilt (js/tilt.js): the card leans, its icon lifts off the surface, and a soft
+   light follows the pointer. */
+[data-tilt] { position: relative; transform-style: preserve-3d; }
+[data-tilt].tilting { --tilt-time: .15s; }
+[data-tilt]::after {
+  content: ''; position: absolute; inset: 0; border-radius: inherit; pointer-events: none;
+  background: radial-gradient(circle at var(--gx, 50%) var(--gy, 50%), var(--glare), transparent 55%);
+  opacity: 0; transition: opacity .4s;
+}
+[data-tilt].tilting::after { opacity: 1; }
+[data-tilt] .card-ico { transition: transform .5s cubic-bezier(.2, .7, .2, 1); }
+[data-tilt].tilting .card-ico { transform: translateZ(28px); }
+
+/* Hero entrance, once on load: the name rises line by line, the portrait swings round
+   to face the visitor, and the award badge flies in from in front of it. */
+.js .hero h1 .line { display: inline-block; transform-origin: 50% 100%; animation: rise3d 1s cubic-bezier(.2, .75, .2, 1) .1s both; }
+.js .hero h1 em.line { animation-delay: .25s; }
+.js .hero .status { animation: rise .8s cubic-bezier(.2, .7, .2, 1) both; }
+.js .hero .lead { animation: rise .8s cubic-bezier(.2, .7, .2, 1) .45s both; }
+.js .hero .hero-ctas { animation: rise .8s cubic-bezier(.2, .7, .2, 1) .55s both; }
+.js .portrait { animation: swing-in 1.4s cubic-bezier(.2, .7, .2, 1) .15s both; }
+.js .award { animation: award-in 1s cubic-bezier(.2, .75, .25, 1.15) .8s both; }
+@keyframes rise3d { from { opacity: 0; transform: perspective(700px) translateY(.3em) rotateX(-80deg); } }
+@keyframes rise { from { opacity: 0; transform: translateY(14px); } }
+@keyframes swing-in { from { opacity: 0; transform: perspective(1200px) translateZ(-160px) rotateY(-34deg) rotateX(8deg); } }
+@keyframes award-in { from { opacity: 0; transform: var(--award-pos) translateZ(240px) rotateX(-30deg); } }
+
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
-  .js .reveal { opacity: 1; transform: none; transition: none; }
-  .btn, .contact-item { transition: none; }
+  .js .reveal { --rv-x: 0deg; --rv-y: 0px; --rv-z: 0px; }
+  .reveal, [data-tilt] { transition: border-color .2s; }
+  .js .hero h1 .line, .js .hero .status, .js .hero .lead, .js .hero .hero-ctas, .js .portrait, .js .award { animation: none; }
+  .btn { transition: none; }
 }
 
 /* ---------- responsive ---------- */
@@ -355,7 +418,7 @@ footer { padding: 40px 0 56px; color: var(--faint); font-size: .9rem; }
   .project-media { position: static; }
   .hero-grid { gap: 48px; }
   .portrait { order: -1; width: min(100%, 270px); }
-  .award { left: 50%; transform: translateX(-50%) translateZ(60px); bottom: -22px; white-space: nowrap; }
+  .award { --award-pos: translateX(-50%) translateZ(60px); left: 50%; bottom: -22px; white-space: nowrap; }
   .stats { grid-template-columns: repeat(2, 1fr); margin-top: 56px; }
   .stat:nth-child(3) { border-left: 0; }
   .stat:nth-child(n+3) { border-top: 1px solid var(--line); }
@@ -363,7 +426,7 @@ footer { padding: 40px 0 56px; color: var(--faint); font-size: .9rem; }
   .contact-box { padding: 32px; gap: 28px; }
 }
 @media (max-width: 760px) {
-  section { padding: 64px 0; }
+  section { padding: 56px 0; }
   .nav-links {
     display: none; position: absolute; top: 68px; left: 0; right: 0;
     flex-direction: column; gap: 2px; padding: 12px 16px 18px;
@@ -382,8 +445,7 @@ footer { padding: 40px 0 56px; color: var(--faint); font-size: .9rem; }
 }
 @media (max-width: 420px) {
   .wrap { padding: 0 16px; }
-  .stats { grid-template-columns: 1fr; }
-  .stat { border-left: 0; }
-  .stat:nth-child(n+2) { border-top: 1px solid var(--line); }
+  .stat { padding: 16px; }
+  .stat b { font-size: 1.4rem; }
   .contact-box { padding: 24px; }
 }
