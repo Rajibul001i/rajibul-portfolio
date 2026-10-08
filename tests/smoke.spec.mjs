@@ -104,6 +104,8 @@ test('theme switch changes colours and is remembered after reload', async ({ pag
 
 test.describe('background (Flow Wave, WebGL)', () => {
   test.use({ wave: true });
+  // software WebGL on test machines draws a few frames a second, slower still on CI
+  test.describe.configure({ timeout: 120_000 });
 
   test('the dark theme background is the glowing cyan wave, and it moves', async ({ page }) => {
     const wave = page.locator('#wave');
@@ -149,9 +151,9 @@ test.describe('background (Flow Wave, WebGL)', () => {
     expect(await sun(), 'the sunny scene stays still while paused').toBe(s);
     await btn.click();
     await expect(btn).toHaveAttribute('aria-pressed', 'false');
-    await expect.poll(sun, { message: 'the sunny scene moves again' }).not.toBe(s);
+    await expect.poll(sun, { message: 'the sunny scene moves again', timeout: 30_000 }).not.toBe(s);
     await page.locator('#theme-btn').click();
-    await expect.poll(() => waveFrames(page), { message: 'the wave moves again', timeout: 10_000 }).toBeGreaterThan(b + 2);
+    await expect.poll(() => waveFrames(page), { message: 'the wave moves again', timeout: 30_000 }).toBeGreaterThan(b + 2);
   });
 });
 

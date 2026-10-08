@@ -56,7 +56,7 @@ test('layout does not jump while loading (CLS under 0.1)', async ({ page }) => {
 
 // Time spent inside animation-frame callbacks (the backgrounds' drawing). Unlike raw
 // fps this does not depend on the screen's refresh rate or on other test workers.
-async function frameCost(page, ms = 2000, wave = false) {
+async function frameCost(page, ms = 2000, wave = false, minFrames = 0) {
   await page.addInitScript(() => {
     const raf = window.requestAnimationFrame.bind(window);
     window.__frames = [];
@@ -67,6 +67,8 @@ async function frameCost(page, ms = 2000, wave = false) {
   await page.evaluate(() => { window.__frames.length = 0; });
   return async () => {
     await page.waitForTimeout(ms);
+    // a slow machine may need longer to collect enough frames to judge
+    if (minFrames) await expect.poll(() => page.evaluate(() => window.__frames.length), { timeout: 60_000 }).toBeGreaterThanOrEqual(minFrames);
     const f = await page.evaluate(() => window.__frames.slice());
     f.sort((a, b) => a - b);
     return { frames: f.length, avg: f.reduce((a, b) => a + b, 0) / f.length, p95: f[Math.floor(f.length * 0.95)] };
@@ -85,6 +87,8 @@ test('the sunny light-theme background also takes under 4 ms a frame', async ({ 
 
 test.describe('background (Flow Wave, WebGL)', () => {
   test.use({ wave: true });
+  // software WebGL on test machines draws a few frames a second, slower still on CI
+  test.describe.configure({ timeout: 120_000 });
 
   test('the wave loads once, only after the page has loaded, in both themes, and costs under 450 KB', async ({ page }) => {
     let bytes = 0;
@@ -109,10 +113,9 @@ test.describe('background (Flow Wave, WebGL)', () => {
   // thread each frame (moving the camera, handing the frame to WebGL); the test machine has
   // no graphics card, so the drawing itself is slow here and not representative.
   test('the wave takes under 4 ms of script a frame (budget is 16 ms for 60 fps)', async ({ page }) => {
-    const done = await frameCost(page, 4000, true); // software WebGL draws only a few frames a second
+    const done = await frameCost(page, 2000, true, 12); // at least 12 frames, however long software WebGL takes
     const r = await done();
     console.log(`flow wave: ${r.frames} frames, avg ${r.avg.toFixed(2)} ms, p95 ${r.p95.toFixed(2)} ms`);
-    expect(r.frames, 'the wave drew (slowly, in software, on the test machine)').toBeGreaterThan(5);
     expect(r.avg).toBeLessThan(4);
   });
 

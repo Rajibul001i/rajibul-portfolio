@@ -9,6 +9,11 @@ for (const w of widths) {
     await page.goto('/');
     for (const theme of ['dark', 'light']) {
       if (theme === 'light') await page.locator('#theme-btn').click();
+      // Measure the page at rest: the award badge flies in toward the viewer on load and is
+      // briefly larger than its place while it does (a slow machine can still be mid-flight).
+      await page.evaluate(() => Promise.all(document.getAnimations()
+        .filter((a) => a.timeline === document.timeline && a.effect.getComputedTiming().iterations !== Infinity)
+        .map((a) => a.finished.catch(() => {}))));
       const overflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
       expect(overflow, `page wider than the screen in ${theme} theme`).toBeLessThanOrEqual(0);
       const wide = await page.evaluate(() => {

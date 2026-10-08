@@ -4,7 +4,8 @@ export default defineConfig({
   testDir: 'tests',
   timeout: 45_000,
   fullyParallel: true,
-  reporter: process.env.CI ? [['list'], ['html', { open: 'never' }]] : [['list']],
+  // on CI, 'github' also turns each failure into an annotation on the run
+  reporter: process.env.CI ? [['github'], ['list'], ['html', { open: 'never' }]] : [['list']],
   use: { baseURL: 'http://localhost:4173', trace: 'off' },
   webServer: { command: 'node tests/server.mjs', url: 'http://localhost:4173', reuseExistingServer: true },
   projects: [
