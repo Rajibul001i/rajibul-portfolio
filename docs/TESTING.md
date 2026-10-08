@@ -21,15 +21,15 @@ npm test
 ```
 
 `npm test` validates the HTML and JavaScript, starts a small local server
-(`tests/server.mjs`), and runs 111 browser checks: 78 on a desktop screen (1366×800) and 33
+(`tests/server.mjs`), and runs 110 browser checks: 77 on a desktop screen (1366×800) and 33
 on a phone (Pixel 7). `npm run validate` also type-checks the TypeScript (`tsc`), and CI
 rebuilds `islands/` and fails if the committed copy differs. Every browser test runs offline, and a test fails if the page logs a
 JavaScript error, breaks the Content-Security-Policy, or requests a file that doesn't exist.
 
-The dark theme's background (`islands/flow-wave.js`) is WebGL. Test machines have no graphics
+The background wave (`islands/flow-wave.js`) is WebGL. Test machines have no graphics
 card, so Chromium draws it in software at a few frames a second, and that slows every
 animation frame on the page: with it running everywhere, 8 unrelated checks (dragging,
-scroll jumps, the entry spring) timed out. It is decoration behind the content, so most
+scroll jumps, entrance animations) timed out. It is decoration behind the content, so most
 tests get an empty stand-in for it and see the CSS background; the checks about the wave
 itself load the real one (`test.use({ wave: true })` in `tests/fixtures.mjs`), and the
 reduced-motion and phone-download checks always do.
@@ -50,7 +50,7 @@ reduced-motion and phone-download checks always do.
 - Regression: the old admin PIN, passwords, API keys and the fake visitor counter stay removed
 - Page basics: language, title, description, viewport, favicon; the photo is not embedded in the HTML
 
-**Visitor journey (24 per device)**
+**Visitor journey (25 per device)**
 - Name, photo and every section load; the footer shows the current year
 - Menu links scroll to their section and highlight it; the phone menu opens, closes with
   Escape and closes after a link is picked
@@ -58,19 +58,20 @@ reduced-motion and phone-download checks always do.
 - Text colours follow the theme: cyan and cool in the dark theme, amber and warm brown in the
   sunny light theme
 - The light theme has its own animated sunny background: warm light in the top corner that
-  moves; the wave is off in the light theme and the sunny canvas is off in the dark one
+  moves; the sun is off in the dark theme
 - The dark theme's wave fades in, keeps drawing, and covers the screen with cyan dots (counted
   in a screenshot, since WebGL pixels can't be read back: 4.4 % of the desktop screen and 1.7 %
   of the phone's, against 0.2–0.5 % for the CSS background alone)
+- The light theme's wave keeps drawing as amber dots on a see-through canvas: comparing
+  screenshots with and without it, it darkens and warms over 1 % of the screen while most of
+  the page stays light cream, and the sun shows too
 - The demo video is served correctly: range requests (206), `video/mp4`, index at the
   front of the file so it can start before it has fully downloaded
 - Project and contact links point to the right places
 - All content becomes visible after scrolling, and is visible with JavaScript turned off
 - Cards lean toward the mouse in 3D and settle back when it leaves
-- The nav, the name and the buttons spring into place and end fully at rest (opacity 1, no
-  transform); pressing R replays it from hidden
-- The first screen has one main (solid) button, and it leads to contact; the outline one leads
-  to the projects
+- The hero's 3D entrance plays once and ends with everything fully in place
+- The first screen has exactly one primary button, and it leads to contact
 - The background can be paused, stays paused after a reload, and plays again: the wave stops
   drawing frames, and the sunny scene obeys the same button
 - Card tilt runs on springs from the Motion library
@@ -80,31 +81,24 @@ reduced-motion and phone-download checks always do.
   swapping the grid for the carousel never changes the page height; a phone-menu jump to
   Contact lands on target while the carousel loads
 
-**Layout (14)**
+**Layout (13)**
 - No sideways scrolling and nothing poking out of the screen at 11 widths from 320 to
   1920 px, in both themes
-- Header buttons, the logo, both hero buttons and "Back to top" are at least 44 px to tap
-- The name and both hero buttons fit on the first phone screen (320×568 and 390×844), with the
-  status line clear of the floating nav
-- The nav fits in its pill on one row at 7 widths from 901 to 1920 px: links clear of the logo
-  and buttons, "Say hello" shown from 1101 px
+- Header buttons, the logo and "Back to top" are at least 44 px to tap; name, photo and buttons fit on the first phone screen
 
-**Accessibility (9 per device)**
+**Accessibility (8 per device)**
 - axe-core finds nothing in the dark theme, the light theme, with the phone menu open, or in
   the loaded carousel (both themes)
-- The name, cut out of a fading colour ramp, keeps 3:1 contrast (the large-text minimum) even
-  at the ramp's faintest point, in both themes; axe can't judge gradient text, so the test
-  works it out
 - The skip link is the first Tab stop; every Tab stop shows a focus ring
 - Headings go in order (one `h1`, no skipped levels)
 - With reduced motion turned on, the wave draws one still frame and stops, nothing animates,
-  the nav and hero are in place at once, sections don't lean in, cards don't tilt, the
+  there is no hero entrance, sections don't lean in, cards don't tilt, the
   (pointless) pause button is hidden, and the sunny light-theme scene is still too
 
 **Performance (11)**
 - First load stays under 600 KB, never downloads the 9 MB video, and doesn't load React
-- The wave (Three.js and the scene) is requested once, only after the page has loaded, costs
-  under 450 KB, and is never downloaded in the light theme
+- The wave (Three.js and the scene) is requested once, only after the page has loaded, in
+  both themes, and costs under 450 KB
 - The carousel costs under 400 KB (React, the component and 8 screenshots), loaded on approach
 - The photo loads as WebP, not the heavier PNG
 - DOM ready under 1.5 s, largest paint under 2.5 s, layout shift under 0.1
@@ -117,26 +111,26 @@ reduced-motion and phone-download checks always do.
 
 ## Results
 
-Run on 7 October 2026, Chromium 141 (Playwright 1.56.1), after adding the Flow Wave background
-and the Spotlight nav and hero:
+Run on 8 October 2026, Chromium 141 (Playwright 1.56.1), after bringing back the original
+layout, slowing the wave and giving the light theme its own amber wave:
 
-**101 passed, 10 skipped, 0 failed**, three times in a row with `npm test` (the same command CI
-runs, about 1 min 50 s). The skips are by design: phone-only checks skipped on desktop,
+**100 passed, 10 skipped, 0 failed**, three times in a row with `npm test` (the same command CI
+runs, about 2 minutes). The skips are by design: phone-only checks skipped on desktop,
 keyboard and mouse checks skipped on the phone, and video playback, which needs the H.264 codec that
 Playwright's open-source Chromium leaves out. Chrome, Edge, Safari and Firefox all have it.
 
 | Measurement | Result | Budget |
 |---|---|---|
-| First load, desktop (includes Motion, 144 KB) | 357 KB in 11 files | 600 KB |
-| Flow Wave, loaded after the page in the dark theme | 407 KB (105 KB gzipped, as GitHub Pages sends it) | 450 KB |
+| First load, desktop (includes Motion, 144 KB, and here all 8 lazy PulseHR thumbnails, 147 KB) | 491 KB in 18 files | 600 KB |
+| Flow Wave, loaded after the page | 408 KB (105 KB gzipped, as GitHub Pages sends it) | 450 KB |
 | PulseHR carousel, loaded on approach | 338 KB in 10 files (React bundle 184 KB, 59 KB gzipped) | 400 KB |
-| First load, phone (no Motion; screenshots below the fold not yet fetched) | 216 KB in 10 files | 600 KB |
-| DOM ready | 107–143 ms | 1.5 s |
-| Largest paint | 140–172 ms | 2.5 s |
+| First load, phone (no Motion; screenshots below the fold not yet fetched) | 203 KB in 9 files | 600 KB |
+| DOM ready | 129–166 ms | 1.5 s |
+| Largest paint | 176–256 ms | 2.5 s |
 | Layout shift | 0.000 | 0.1 |
-| Flow Wave script per frame, normal CPU | avg 0.15–0.55 ms, p95 0.7–6.8 ms | 4 ms avg |
-| Sunny light-theme background, normal CPU | avg 0.25–0.28 ms, p95 0.7–0.8 ms a frame | 4 ms avg |
-| Flow Wave on a phone screen, 4x slower CPU + scrolling | avg 1.6–1.9 ms, p95 4.3–6.6 ms a frame | 10 ms avg, 16 ms p95 |
+| Flow Wave script per frame, normal CPU (software WebGL) | avg 1.0–2.0 ms, p95 3.4–7.7 ms | 4 ms avg |
+| Light theme's sun, normal CPU | avg 0.6–0.8 ms, p95 1.0–1.5 ms a frame | 4 ms avg |
+| Flow Wave on a phone screen, 4x slower CPU + scrolling | avg 2.1–2.6 ms, p95 5.8–7.4 ms a frame | 10 ms avg, 16 ms p95 |
 
 ## Bugs the tests found, and the fixes
 
@@ -160,8 +154,7 @@ Playwright's open-source Chromium leaves out. Chrome, Edge, Safari and Firefox a
 | P-17 | Screenshot review | The bright wave behind the About text made it hard to read | A veil in the page colour fades in past the first screen and hides 60 % of the wave; it follows the scroll even while the wave is paused |
 | P-18 | Full test run | Chromium draws WebGL in software on test machines, slowing every animation frame; 8 unrelated checks timed out | Tests get an empty stand-in for the wave unless they are about it (see above) |
 | P-19 | Intermittent failure | The carousel-weight check sometimes counted 7 of its 10 files: its second "wait for the network to go quiet" returned at once, because the page had already gone quiet after loading | Wait for the 10 files themselves |
-| P-20 | Intermittent failure | The tap-target check measured the menu button mid-rise, at 43.999996 px | Measure once the entry spring has settled |
-| P-21 | Contrast calculation | The name's ramp fades to 0.3 white (dark) and 0.38 brown (light): about 2.6:1 at the last letters, below the 3:1 large-text minimum. axe doesn't check gradient text, and with the narrower fallback font used offline the last letter never reached the faint end, so only working it out at the ramp's edge showed it | Faint end raised to 0.4 and 0.5 (3.8:1 and 3.2:1), with a font-independent test |
+| P-20 | Full test run | With the wave behind the blurred sticky header, software WebGL drew only 5 frames in the 2-second cost window, and the sun took over 5 s to draw its first frames while the wave ran | Wave cost measured over 4 s; the sun given 20 s to start |
 | P-8 | Layout test | The new 3D scroll reveal swung the bottom of the tall project card toward the viewer, making the page 1–6 px wider than a phone screen | Large blocks hinge on their bottom edge, so no part comes forward |
 
 The colour changes are small shifts of the same teal and grey, so the theme looks the same.

@@ -35,19 +35,16 @@
     });
   }
 
-  // Dark theme background: the Flow Wave scene (islands/flow-wave.js, Three.js). It is
-  // fetched only when the dark theme is showing, after the page has loaded, so it never
-  // delays the first paint; the CSS nebula shows until it fades in, and stays if WebGL
-  // isn't available.
-  var waveLoaded = false;
+  // Background: the Flow Wave scene (islands/flow-wave.js, Three.js), cyan in the dark
+  // theme and amber in the light one. It is fetched after the page has loaded, so it never
+  // delays the first paint; the CSS sky shows until it fades in, and stays if WebGL isn't
+  // available.
   function loadWave() {
-    if (waveLoaded || root.dataset.theme === 'light' || !document.getElementById('wave')) return;
-    waveLoaded = true;
+    if (!document.getElementById('wave')) return;
     import(new URL('islands/flow-wave.js', document.baseURI).href).catch(function () {});
   }
   if (document.readyState === 'complete') loadWave();
   else window.addEventListener('load', loadWave);
-  window.addEventListener('themechange', loadWave);
 
   // Mobile menu
   var menuBtn = document.getElementById('menu-btn');

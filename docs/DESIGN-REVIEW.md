@@ -42,18 +42,15 @@ The rules themselves were applied.
   under the sticky header, and its focused control (the play bar at the bottom) stayed visible.
 - Small label text (tags, captions at 13–14 px) is label text, not body text; body text is 16 px.
 
-## Spotlight nav and hero, Flow Wave background (applied later)
+## Flow Wave background (applied later)
 
-The dark theme's starfield was replaced by the Flow Wave scene (Three.js), and the nav and
-hero took the Spotlight look. Checked against the same rules:
+The starfield was replaced by the Flow Wave scene (Three.js) in both themes: cyan light on
+deep blue in the dark theme, amber ink on cream under the sun in the light one. Checked
+against the same rules:
 
 | Rule | Result |
 |---|---|
-| `color-contrast` | The name is cut out of a ramp that fades to the right. At the design's 0.3 the last letters of "Rabbi" fell to about 2.6:1, below the 3:1 large-text minimum (and the light theme's 0.38 likewise). The faint end is now 0.4 (dark) and 0.5 (light): 3.8:1 and 3.2:1 even at the ramp's very edge, checked by a test, since axe can't read gradient text |
-| `color-contrast` over motion | The bright wave made the About text hard to read. Past the first screen a veil in the page colour hides 60 % of it |
-| `primary-action` | Kept as designed, one exception: the floating nav has its own black "Say hello" pill (to WhatsApp), so on wide screens the first screen shows two black pills. In the hero there is one solid button ("Let's talk", to Contact) and one outline button. Below 1101 px the nav pill drops it |
-| `touch-target-size` | Nav buttons and both hero buttons are 44 px or taller at every width (tested) |
-| `focus-not-obscured` | The nav now floats over the page, so `scroll-padding-top` follows its height and offset; a section reached from the menu lands below it |
-| `reduced-motion` | The entry spring, the wave and the sunny scene all stand still; the pause button hides |
-| `main-thread-budget` | The wave's script costs about 0.2 ms a frame; its drawing runs on the graphics card. It loads after the page (never in the light theme) and stops when the tab is hidden |
-
+| `color-contrast` over motion | The wave made the About text hard to read. Past the first screen a veil in the page colour hides 60 % of it, in both themes; in the light theme the sun stays above the veil |
+| Calm motion behind text | The stream and the haze run at 60 % of the scene's original speed |
+| `reduced-motion` | The wave draws one still frame; the pause button hides |
+| `main-thread-budget` | The wave's script costs about 1 ms a frame; its drawing runs on the graphics card. It loads after the page and stops when the tab is hidden or the background is paused |

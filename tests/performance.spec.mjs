@@ -2,8 +2,8 @@
 // downloaded up front, layout shift, and drawing cost per frame on a slow phone CPU.
 import { test, expect } from './fixtures.mjs';
 
-// The dark-theme background (islands/flow-wave.js, Three.js) is fetched after the page
-// has loaded, so it is measured on its own below rather than as part of the first load.
+// The background (islands/flow-wave.js, Three.js) is fetched after the page has loaded,
+// so it is measured on its own below rather than as part of the first load.
 const isWave = (u) => u.endsWith('islands/flow-wave.js');
 
 test('first load stays under 600 KB and does not download the 9 MB video', async ({ page }) => {
@@ -83,36 +83,33 @@ test('the sunny light-theme background also takes under 4 ms a frame', async ({ 
   expect(r.avg).toBeLessThan(4);
 });
 
-test.describe('dark-theme background (Flow Wave, WebGL)', () => {
+test.describe('background (Flow Wave, WebGL)', () => {
   test.use({ wave: true });
 
-  test('the dark-theme wave loads only after the page, costs under 450 KB, and never loads in the light theme', async ({ page }) => {
+  test('the wave loads once, only after the page has loaded, in both themes, and costs under 450 KB', async ({ page }) => {
     let bytes = 0;
     page.on('response', async (res) => { if (isWave(res.url())) bytes = (await res.body()).length; });
-    await page.goto('/');
-    await expect(page.locator('#wave')).toHaveClass(/\bon\b/, { timeout: 20_000 });
-    const t = await page.evaluate(() => ({
-      load: performance.getEntriesByType('navigation')[0].loadEventStart,
-      wave: performance.getEntriesByType('resource').filter((e) => e.name.endsWith('islands/flow-wave.js')).map((e) => e.startTime),
-    }));
-    expect(t.wave, 'requested once').toHaveLength(1);
-    expect(t.wave[0], 'requested after the page has loaded').toBeGreaterThanOrEqual(t.load);
+    for (const theme of ['dark', 'light']) {
+      if (theme === 'light') await page.addInitScript(() => { try { localStorage.setItem('theme', 'light'); } catch { /* no storage */ } });
+      await page.goto('/');
+      await expect(page.locator('#wave'), `${theme} theme`).toHaveClass(/\bon\b/, { timeout: 20_000 });
+      const t = await page.evaluate(() => ({
+        load: performance.getEntriesByType('navigation')[0].loadEventStart,
+        wave: performance.getEntriesByType('resource').filter((e) => e.name.endsWith('islands/flow-wave.js')).map((e) => e.startTime),
+      }));
+      expect(t.wave, `requested once (${theme})`).toHaveLength(1);
+      expect(t.wave[0], `requested after the page has loaded (${theme})`).toBeGreaterThanOrEqual(t.load);
+    }
     console.log(`flow wave: ${(bytes / 1024).toFixed(0)} KB (Three.js and the scene)`);
     expect(bytes).toBeLessThan(450 * 1024);
-
-    const light = [];
-    await page.addInitScript(() => { try { localStorage.setItem('theme', 'light'); } catch { /* no storage */ } });
-    page.on('request', (r) => isWave(r.url()) && light.push(r.url()));
-    await page.reload({ waitUntil: 'networkidle' });
-    await expect(page.locator('html')).toHaveAttribute('data-theme', 'light');
-    expect(light, 'light-theme visitors never download it').toEqual([]);
   });
+
 
   // The wave is drawn by the graphics card. This measures what it costs the page's own
   // thread each frame (moving the camera, handing the frame to WebGL); the test machine has
   // no graphics card, so the drawing itself is slow here and not representative.
-  test('the dark-theme wave takes under 4 ms of script a frame (budget is 16 ms for 60 fps)', async ({ page }) => {
-    const done = await frameCost(page, 2000, true);
+  test('the wave takes under 4 ms of script a frame (budget is 16 ms for 60 fps)', async ({ page }) => {
+    const done = await frameCost(page, 4000, true); // software WebGL draws only a few frames a second
     const r = await done();
     console.log(`flow wave: ${r.frames} frames, avg ${r.avg.toFixed(2)} ms, p95 ${r.p95.toFixed(2)} ms`);
     expect(r.frames, 'the wave drew (slowly, in software, on the test machine)').toBeGreaterThan(5);
@@ -149,7 +146,7 @@ test.describe('dark-theme background (Flow Wave, WebGL)', () => {
 
     await page.addInitScript(() => { try { localStorage.setItem('theme', 'light'); } catch { /* no storage */ } });
     await page.reload();
-    await expect.poll(() => frames('#sky')).toBeGreaterThan(2);
+    await expect.poll(() => frames('#sky'), { timeout: 20_000 }).toBeGreaterThan(2);
     await hide();
     await page.waitForTimeout(150);
     a = await frames('#sky'); await page.waitForTimeout(800);

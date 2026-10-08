@@ -4,7 +4,7 @@
   "description": "Portfolio site (static HTML/CSS/JS) plus React islands built from src/ into islands/.",
   "scripts": {
     "test": "npm run validate && npm run test:browser",
-    "validate": "html-validate index.html && node --check js/main.js && node --check js/sunlight.js && node --check js/rise.js && node --check js/tilt.js && node --check js/theme-init.js && tsc -p tsconfig.json",
+    "validate": "html-validate index.html && node --check js/main.js && node --check js/sunlight.js && node --check js/tilt.js && node --check js/theme-init.js && tsc -p tsconfig.json",
     "test:browser": "playwright test",
     "build": "vite build",
     "demo": "vite",

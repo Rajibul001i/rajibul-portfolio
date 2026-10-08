@@ -1,7 +1,7 @@
 // Shared fixture: every browser test runs offline (third-party requests such as
 // Google Fonts are blocked) and fails if the page logs an error or a local file 404s.
 //
-// The dark-theme background (islands/flow-wave.js) is WebGL. The test machines have no
+// The background (islands/flow-wave.js) is WebGL. The test machines have no
 // graphics card, so Chromium draws it in software at a few frames a second, and that slows
 // every animation frame on the page (scrolling, dragging, springs). It is decoration behind
 // the content, so tests get an empty stand-in, and the CSS background shows. Tests about

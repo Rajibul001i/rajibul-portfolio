@@ -1,18 +1,22 @@
-// Flow Wave: the dark theme's background. A wide sea of glowing particle hills rolling
-// under two octaves of Simplex noise. Scrolling the page dives the camera from a high view
-// to skim low over the field while the swell grows and the hills stream toward you; the
-// cursor parallaxes the view and parts the surface where it points. A faint corner haze
-// and drifting motes wrap the frame.
+// Flow Wave: the page background. A wide sea of particle hills rolling under two octaves
+// of Simplex noise. Scrolling the page dives the camera from a high view to skim low over
+// the field while the swell grows and the hills stream toward you; the cursor parallaxes
+// the view and parts the surface where it points. A faint corner haze and drifting motes
+// wrap the frame.
 //
 // Ported from the standalone Flow Wave scene (Three.js r143), recoloured to the site's
-// cyan-on-deep-blue palette. Two adaptations for a page that must also stay light:
+// palette and slowed down (flow 0.6 instead of 1) to sit calmly behind the text.
+//  - Dark theme: glowing cyan points on deep blue, as designed.
+//  - Light theme: the same scene, but the composite turns the light each point gives off
+//    into ink (amber, deepening to burnt orange where the points crowd) on a transparent
+//    canvas, so the cream page and the sun (js/sunlight.js) show around the dots.
 //  - The original rendered two extra composers (a "torus" and a "bloom" pass) that only
 //    ever drew objects on layers nothing is placed on, so they added black. They are left
 //    out; the composite still samples those textures (now empty) and looks the same.
 //  - Pixel ratio is capped at 2, and phones use a lighter sheet (fewer points).
 //
-// js/main.js imports the built file (islands/flow-wave.js) while the dark theme is on.
-// The light theme, the pause button, reduced motion and a hidden tab all stop it.
+// js/main.js imports the built file (islands/flow-wave.js) once the page has loaded. The
+// pause button, reduced motion and a hidden tab stop it.
 import {
   AdditiveBlending,
   BufferAttribute,
@@ -41,14 +45,14 @@ const flameAmt = 0.2;
 const atmoColor = "#7AFFEF"; //    ambient motes
 const atmoCount = 300;
 const atmoSize = 24;
-const atmoSpeed = 1.2000000000000002;
+const atmoSpeed = 0.8; //           the scene's own value is 1.2; slowed with the flow
 const colorLow = "#08111A"; //     points, low
 const colorHigh = "#00DEC8"; //    points, high (site accent)
 const opacity = 0.26;
 const pointSize = 5.5;
 const brightness = 0.45;
 const waveHeight = 3;
-const flow = 1;
+const flow = 0.6; //                the scene's own value is 1: a calmer, slower stream
 const tilt = -0.24;
 const scale = 0.275;
 const scrollRise = 1;
@@ -58,6 +62,11 @@ const lookStartZ = 2, lookEndZ = -16;
 const parallax = 1.2;
 const pointerRadius = 7;
 const pointerStrength = 0.9;
+/* light theme: ink on cream instead of light on dark */
+const inkLow = "#E9A23B"; //       amber, where a few points meet
+const inkHigh = "#B4530B"; //      burnt orange, where they crowd
+const hazeLight = "#F5B66A"; //    the corner haze, as warm light
+const inkAlpha = 0.85;
 
 const Lerp = (a: number, b: number, t: number) => a + (b - a) * t;
 const clamp = (v: number, lo: number, hi: number) => Math.max(lo, Math.min(hi, v));
@@ -144,6 +153,7 @@ varying vec2 vUv; void main(){ vUv = uv; gl_Position = vec4(position, 1.0); }
 const FINAL_FRAG = /* glsl */ `
 uniform float iTime; uniform sampler2D tDiffuse; uniform sampler2D bloomTexture; uniform sampler2D torusTexture; uniform sampler2D haloTexture;
 uniform vec3 uBg; uniform vec3 uFlameA; uniform vec3 uFlameB; uniform float uFlameAmt;
+uniform float uLight; uniform vec3 uInkLow; uniform vec3 uInkHigh; uniform vec3 uHaze; uniform float uInkAlpha;
 varying vec2 vUv;
 vec3 warp3d(vec3 pos, float t){ float curv=.8,a=1.9,b=0.7; pos*=2.;
   pos.x+=curv*sin(t+a*pos.y)+t*b; pos.y+=curv*cos(t+a*pos.x);
@@ -156,9 +166,19 @@ void main(){
   vec3 flame = 1.5*uFlameA*w.x; flame*=w.y; flame += uFlameB*w.z;
   flame *= smoothstep(0.25, 1., abs(uv.y));
   float md = smoothstep(-0.7, 1., -uv.y*uv.x); flame *= md*md;
-  vec3 bg = uBg * (1.0 - 0.4 * length(uv));
   vec3 halo = texture2D(haloTexture, vUv).xyz;
-  gl_FragColor = vec4(bg + flame*uFlameAmt + texture2D(bloomTexture, vUv).xyz + texture2D(torusTexture, vUv).xyz + texture2D(tDiffuse, vUv).xyz + halo, 1.);
+  vec3 scn = texture2D(bloomTexture, vUv).xyz + texture2D(torusTexture, vUv).xyz + texture2D(tDiffuse, vUv).xyz + halo;
+  if (uLight > 0.5) {
+    // light each pixel received -> how much ink it gets; premultiplied, ink over haze
+    float i = max(scn.r, max(scn.g, scn.b));
+    float a = smoothstep(0.02, 0.45, i) * uInkAlpha;
+    vec3 ink = mix(uInkLow, uInkHigh, smoothstep(0.15, 0.8, i));
+    float h = clamp(max(flame.r, max(flame.g, flame.b)) * uFlameAmt * 1.4, 0.0, 1.0);
+    gl_FragColor = vec4(ink * a + uHaze * h * (1.0 - a), a + h * (1.0 - a));
+    return;
+  }
+  vec3 bg = uBg * (1.0 - 0.4 * length(uv));
+  gl_FragColor = vec4(bg + flame*uFlameAmt + scn, 1.);
 }
 `;
 
@@ -188,14 +208,16 @@ void main(){ vec2 p = gl_PointCoord - 0.5; float l = length(p); if (l > 0.5) dis
 const VEIL = 0.6; // how much of the surface the veil hides once past the hero
 const root = document.documentElement;
 const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
-const isDark = () => root.dataset.theme !== "light";
+const isLight = () => root.dataset.theme === "light";
 const isPaused = () => root.dataset.sky === "paused";
 const dpr = () => Math.min(window.devicePixelRatio || 1, 2);
 
 function start(canvas: HTMLCanvasElement) {
   canvas.dataset.started = "true";
 
-  const renderer = new WebGL1Renderer({ canvas, antialias: true });
+  // alpha: the light theme's composite is see-through (the dark one writes full alpha)
+  const renderer = new WebGL1Renderer({ canvas, antialias: true, alpha: true });
+  renderer.setClearColor(0x000000, 0);
   renderer.setPixelRatio(dpr());
 
   const scene = new Scene();
@@ -217,6 +239,11 @@ function start(canvas: HTMLCanvasElement) {
       uFlameA: { value: hexToVec3(flameColor) },
       uFlameB: { value: hexToVec3(flameColor2) },
       uFlameAmt: { value: flameAmt },
+      uLight: { value: isLight() ? 1 : 0 },
+      uInkLow: { value: hexToVec3(inkLow) },
+      uInkHigh: { value: hexToVec3(inkHigh) },
+      uHaze: { value: hexToVec3(hazeLight) },
+      uInkAlpha: { value: inkAlpha },
     },
     vertexShader: FINAL_VERT,
     fragmentShader: FINAL_FRAG,
@@ -380,8 +407,8 @@ function start(canvas: HTMLCanvasElement) {
     if (frames === 1) canvas.classList.add("on");
   }
 
-  /* render loop: runs only while the dark theme is on, the sky isn't paused, motion is
-     allowed and the tab is visible. Otherwise the last frame stays (or one still frame). */
+  /* render loop: runs while the background isn't paused, motion is allowed and the tab is
+     visible. Otherwise the last frame stays (or one still frame). */
   let raf = 0;
   function loop() {
     raf = requestAnimationFrame(loop);
@@ -398,21 +425,19 @@ function start(canvas: HTMLCanvasElement) {
     uniforms.uAppear.value = 1;
     draw();
   }
-  let shownBefore = false;
   function sync() {
-    const moving = isDark() && !isPaused() && !reduced && !document.hidden;
+    finalPass.uniforms.uLight.value = isLight() ? 1 : 0;
+    const moving = !isPaused() && !reduced && !document.hidden;
     if (moving) {
       if (!raf) {
         t0 = performance.now() / 1000;
-        if (!shownBefore) appearStart = performance.now();
         raf = requestAnimationFrame(loop);
       }
     } else {
       cancelAnimationFrame(raf);
       raf = 0;
-      if (isDark() && !document.hidden) stillFrame();
+      if (!document.hidden) stillFrame(); // also redraws in the new colours after a theme switch
     }
-    if (isDark()) shownBefore = true;
   }
 
   function resize() {
@@ -428,7 +453,7 @@ function start(canvas: HTMLCanvasElement) {
     // same dots as a standard one (the motes already scale through uRes).
     uniforms.uSize.value = pointSize * r;
     readScroll();
-    if (!raf && isDark()) stillFrame(); // a resize clears the canvas
+    if (!raf) stillFrame(); // a resize clears the canvas
   }
   addEventListener("resize", resize);
   addEventListener("themechange", sync);
